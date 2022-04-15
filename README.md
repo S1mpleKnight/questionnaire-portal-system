@@ -2,8 +2,6 @@
 
 Java Spring Softarex test project
 
-#url
-
 
 |  Page name  |  URL |
 | :---------: | :---: |
@@ -12,6 +10,6 @@ Java Spring Softarex test project
 |  Edit Profile | /edit-profile|
 |  Change Password | /change-password|
 |  Fields list page | /fields|
-|  Questionnaire page | / |
+|  Questionnaire page | /{:userId} |
 |  Success submit of answer | /congratulation|
 |  Responses list page | /responses|
