@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-field
+      author: Ivan Zelezinsky
+      changes:
+        - createTable:
+            tableName: fields
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: boolean
+              - column:
+                  name: is_required
+                  type: boolean
+              - column:
+                  name: label
+                  type: varchar(255)
+              - column:
+                  name: type
+                  type: varchar(20)

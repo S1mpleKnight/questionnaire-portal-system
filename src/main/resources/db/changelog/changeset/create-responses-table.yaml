@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-responses
+      author: Ivan Zelezinsky
+      changes:
+        - createTable:
+            tableName: responses
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: value
+                  type: varchar(255)
