@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-questionnaries
+      author: Ivan Zelezinsky
+      changes:
+        - createTable:
+            tableName: questionnaires
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false

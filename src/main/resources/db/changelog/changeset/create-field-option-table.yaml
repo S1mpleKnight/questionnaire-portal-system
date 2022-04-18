@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-field-option
+      author: Ivan Zelezinsky
+      changes:
+        - createTable:
+            tableName: field_options
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: value
+                  type: varchar(50)
