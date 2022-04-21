@@ -1,10 +1,12 @@
 package by.softarex.internship.task.questionnaireportalsystem.util;
 
 import by.softarex.internship.task.questionnaireportalsystem.dto.FieldDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.ResponseDto;
 import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
+import by.softarex.internship.task.questionnaireportalsystem.entity.Response;
 import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -12,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -27,10 +30,12 @@ public class EntityMapper {
         fieldDto.setActive(field.isActive());
         fieldDto.setLabel(field.getLabel());
         fieldDto.setRequired(field.isRequired());
-        fieldDto.setFieldOptions(field.getOptions()
-                .stream()
-                .map(FieldOption::toString)
-                .collect(Collectors.joining(FIELD_OPTIONS_DELIMITER)));
+        if (field.getFieldType() == FieldType.COMBOBOX || field.getFieldType() == FieldType.RADIO_BUTTON) {
+            fieldDto.setFieldOptions(field.getOptions()
+                    .stream()
+                    .map(FieldOption::toString)
+                    .collect(Collectors.joining(FIELD_OPTIONS_DELIMITER)));
+        }
         return fieldDto;
     }
 
@@ -40,10 +45,12 @@ public class EntityMapper {
         field.setRequired(fieldDto.isRequired());
         field.setLabel(fieldDto.getLabel());
         field.setFieldType(FieldType.valueOf(fieldDto.getFieldType()));
-        field.setOptions(Arrays.stream(fieldDto.getFieldOptions()
-                .split(FIELD_OPTIONS_DELIMITER))
-                .map(FieldOption::new)
-                .collect(Collectors.toSet()));
+        if (field.getFieldType() == FieldType.COMBOBOX || field.getFieldType() == FieldType.RADIO_BUTTON) {
+            field.setOptions(Arrays.stream(fieldDto.getFieldOptions()
+                    .split(FIELD_OPTIONS_DELIMITER))
+                    .map(FieldOption::new)
+                    .collect(Collectors.toSet()));
+        }
         return field;
     }
 
@@ -64,5 +71,12 @@ public class EntityMapper {
         user.setLastname(userDto.getLastname());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         return user;
+    }
+
+    public ResponseDto mapToResponseDto(Response response, List<Field> fields) {
+        ResponseDto responseDto = new ResponseDto();
+        responseDto.setValue(response.getValue());
+        responseDto.setFieldPosition(((Integer) fields.lastIndexOf(response.getField())).toString());
+        return responseDto;
     }
 }
