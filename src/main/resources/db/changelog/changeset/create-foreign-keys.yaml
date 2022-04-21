@@ -70,3 +70,15 @@ databaseChangeLog:
             referencedTableName: questionnaires
             referencedColumnNames: id
             constraintName: responses_questionnaire_FK
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: questionnaire_id
+                  type: uuid
+              - addForeignKeyConstraint:
+                  baseTableName: users
+                  baseColumnNames: questionnaire_id
+                  referencedTableName: questionnaires
+                  referencedColumnNames: id
+                  constraintName: user_questionnaire_FK
