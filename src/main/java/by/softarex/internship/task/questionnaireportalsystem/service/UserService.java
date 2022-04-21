@@ -19,9 +19,17 @@ import java.util.UUID;
 @Scope("singleton")
 @AllArgsConstructor
 public class UserService {
+    private final static String MAIL_MESSAGE = "Password has been changed";
+    private final static String MAIL_SUBJECT = "Security notification";
     private UserRepository userRepository;
     private EntityMapper mapper;
     private PasswordEncoder passwordEncoder;
+    private MailService mailService;
+
+    public UserDto findById(UUID currentUserId) {
+        User user = userRepository.findById(currentUserId).get();
+        return mapper.mapToUserDto(user);
+    }
 
     public void save(UserDto userDto) {
         User user = mapper.mapToUserEntity(userDto);
@@ -45,7 +53,7 @@ public class UserService {
         if (user.getPassword().equals(receivedPasswordValue)) {
             user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
             userRepository.save(user);
-            //todo: email notification
+            mailService.send(user.getEmail(), MAIL_SUBJECT, MAIL_MESSAGE);
         }
         throw new InvalidPasswordException();
     }
