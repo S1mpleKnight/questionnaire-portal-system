@@ -6,8 +6,9 @@ Java Spring Softarex test project
 |  Page name  |  URL |
 | :---------: | :---: |
 |  Log in | /login|
+|  Log out | /logout|
 |  Sign up | /register|
-|  Edit Profile | /edit-profile|
+|  Edit Profile | /profile|
 |  Change Password | /change-password|
 |  Fields list page | /fields|
 |  Questionnaire page | /{:userId} |
