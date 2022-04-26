@@ -3,6 +3,7 @@ package by.softarex.internship.task.questionnaireportalsystem.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,14 +20,20 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
     private String firstname;
     private String lastname;
     private String email;
-    private String login;
+    @Column(name = "phone_number")
+    private String phone;
     @Column(name = "password_hash")
-    private String password;
+    private String passwordHash;
     @OneToOne
     @JoinColumn(name = "questionnaire_id", referencedColumnName = "id")
     @ToString.Exclude
