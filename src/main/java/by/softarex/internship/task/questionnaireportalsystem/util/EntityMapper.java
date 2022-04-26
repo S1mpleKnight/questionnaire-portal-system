@@ -58,7 +58,7 @@ public class EntityMapper {
     public UserUpdateDto mapToUserDto(User user) {
         UserUpdateDto userUpdateDto = new UserUpdateDto();
         userUpdateDto.setEmail(user.getEmail());
-        userUpdateDto.setFirstname(user.getEmail());
+        userUpdateDto.setFirstname(user.getFirstname());
         userUpdateDto.setLastname(user.getLastname());
         userUpdateDto.setPhone(user.getPhone());
         return userUpdateDto;
