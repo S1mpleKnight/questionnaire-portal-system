@@ -22,9 +22,6 @@ databaseChangeLog:
                   name: email
                   type: varchar(255)
               - column:
-                  name: login
-                  type: varchar(255)
-              - column:
                   name: password_hash
                   type: varchar(255)
               - column:

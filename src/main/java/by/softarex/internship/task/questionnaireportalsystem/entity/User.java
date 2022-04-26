@@ -30,9 +30,10 @@ public class User {
     private String firstname;
     private String lastname;
     private String email;
-    private String login;
+    @Column(name = "phone_number")
+    private String phone;
     @Column(name = "password_hash")
-    private String password;
+    private String passwordHash;
     @OneToOne
     @JoinColumn(name = "questionnaire_id", referencedColumnName = "id")
     @ToString.Exclude
