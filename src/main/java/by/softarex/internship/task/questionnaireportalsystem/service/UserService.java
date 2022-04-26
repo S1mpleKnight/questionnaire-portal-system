@@ -37,15 +37,13 @@ public class UserService implements UserDetailsService {
 
     public void save(UserDto userDto) {
         User user = mapper.mapToUserEntity(userDto);
-        if (isUserExist(user.getEmail())) {
-            throw new EmailExistException(user.getEmail());
-        } else {
+        if (!isNotUserExist(user.getEmail())) {
             userRepository.save(user);
         }
     }
 
     public void update(Principal principal, UserUpdateDto userDto) {
-        if (isUserExist(userDto.getEmail())) {
+        if (userDto.getEmail().equals(principal.getName()) || !isNotUserExist(userDto.getEmail())) {
             User oldData = userRepository.findByEmail(principal.getName());
             updateUserData(userDto, oldData);
             userRepository.save(oldData);
@@ -89,8 +87,11 @@ public class UserService implements UserDetailsService {
         oldData.setPhone(userDto.getPhone());
     }
 
-    private boolean isUserExist(String email) {
-        return isEmailExist(email);
+    private boolean isNotUserExist(String email) {
+        if (isEmailExist(email)) {
+            throw new EmailExistException(email);
+        }
+        return false;
     }
 
     private boolean isEmailExist(String email) {
