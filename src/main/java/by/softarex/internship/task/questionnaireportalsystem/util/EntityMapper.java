@@ -3,6 +3,7 @@ package by.softarex.internship.task.questionnaireportalsystem.util;
 import by.softarex.internship.task.questionnaireportalsystem.dto.FieldDto;
 import by.softarex.internship.task.questionnaireportalsystem.dto.ResponseDto;
 import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.UserUpdateDto;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
@@ -54,22 +55,27 @@ public class EntityMapper {
         return field;
     }
 
-    public UserDto mapToUserDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setLogin(user.getLogin());
-        userDto.setEmail(user.getEmail());
-        userDto.setFirstname(user.getEmail());
-        userDto.setLastname(user.getLastname());
-        return userDto;
+    public UserUpdateDto mapToUserDto(User user) {
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        userUpdateDto.setEmail(user.getEmail());
+        userUpdateDto.setFirstname(user.getEmail());
+        userUpdateDto.setLastname(user.getLastname());
+        userUpdateDto.setPhone(user.getPhone());
+        return userUpdateDto;
     }
 
     public User mapToUserEntity(UserDto userDto) {
+        User user = createUser(userDto);
+        user.setPasswordHash(passwordEncoder.encode(userDto.getPassword()));
+        return user;
+    }
+
+    private User createUser(UserDto userDto) {
         User user = new User();
         user.setEmail(userDto.getEmail());
-        user.setLogin(userDto.getLogin());
+        user.setPhone(userDto.getPhone());
         user.setFirstname(userDto.getFirstname());
         user.setLastname(userDto.getLastname());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         return user;
     }
 
