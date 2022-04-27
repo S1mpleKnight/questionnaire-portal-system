@@ -50,15 +50,15 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void changePassword(UUID currentUserId, ChangePasswordDto changePasswordDto) {
-        User user = userRepository.findById(currentUserId).get();
-        String receivedPasswordValue = passwordEncoder.encode(changePasswordDto.getOldPassword());
-        if (user.getPasswordHash().equals(receivedPasswordValue)) {
-            user.setPasswordHash(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+    public void changePassword(Principal principal, ChangePasswordDto passwordDto) {
+        User user = userRepository.findByEmail(principal.getName());
+        if (passwordEncoder.matches(passwordDto.getOldPassword(), user.getPasswordHash())) {
+            user.setPasswordHash(passwordEncoder.encode(passwordDto.getNewPassword()));
             userRepository.save(user);
             mailService.send(user.getEmail(), MAIL_SUBJECT, MAIL_MESSAGE);
+        } else {
+            throw new InvalidPasswordException();
         }
-        throw new InvalidPasswordException();
     }
 
     public UUID findIdByEmail(String email) {
