@@ -16,11 +16,11 @@ databaseChangeLog:
                   name: is_active
                   type: boolean
               - column:
-                  name: is_required
+                  name: required
                   type: boolean
               - column:
                   name: label
                   type: varchar(255)
               - column:
-                  name: type
-                  type: varchar(20)
+                  name: field_type
+                  type: varchar(16)
