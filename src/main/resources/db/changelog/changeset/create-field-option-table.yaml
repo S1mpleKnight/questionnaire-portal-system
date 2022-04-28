@@ -7,8 +7,9 @@ databaseChangeLog:
             tableName: field_options
             columns:
               - column:
+                  autoIncrement: true
                   name: id
-                  type: uuid
+                  type: bigint
                   constraints:
                     primaryKey: true
                     nullable: false
