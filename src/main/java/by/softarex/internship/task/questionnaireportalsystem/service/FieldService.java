@@ -6,6 +6,7 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Response;
+import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldOptionRepository;
@@ -20,11 +21,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,35 +40,51 @@ public class FieldService {
     private final ResponseRepository responseRepository;
     private final EntityMapper mapper;
 
-    public Page<FieldDto> findAllByUserId(UUID UserId, Pageable pageable) {
-        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Id(UserId);
-        List<Field> fields = questionnaire.isPresent()
-                ? fieldRepository.findAllByQuestionnaire_Id(questionnaire.get().getId())
-                : Collections.emptyList();
+    public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
+        List<Field> fields = getAllField(principal);
         return new PageImpl<>(fields.stream().map(mapper::mapToFieldDto).collect(Collectors.toList()), pageable, fields.size());
     }
 
-    public void save(UUID currentUserId, FieldDto fieldDto) {
-        Questionnaire questionnaire = getQuestionnaire(currentUserId);
+    public List<FieldDto> findAllByUserEmail(Principal principal) {
+        List<Field> fields = getAllField(principal);
+        return fields.stream().map(mapper::mapToFieldDto).collect(Collectors.toList());
+    }
+
+    public FieldDto getFieldDto(Principal principal, Integer fieldPosition) {
+        return mapper.mapToFieldDto(getField(principal.getName(), fieldPosition));
+    }
+
+    @Transactional
+    public void save(Principal principal, FieldDto fieldDto) {
+        Questionnaire questionnaire = getQuestionnaire(principal);
         Field field = mapper.mapToFieldEntity(fieldDto);
         field.setQuestionnaire(questionnaire);
         fieldRepository.save(field);
         saveFieldOptions(field);
     }
 
-    public void delete(UUID currentUserId, Integer fieldPosition) {
-        Field field = getField(currentUserId, fieldPosition);
+    @Transactional
+    public void delete(Principal principal, Integer fieldPosition) {
+        Field field = getField(principal.getName(), fieldPosition);
         deleteDependEntities(field);
         fieldRepository.delete(field);
     }
 
-    public void update(UUID currentUserId, Integer fieldPosition, FieldDto fieldDto) {
-        Field field = getField(currentUserId, fieldPosition);
+    @Transactional
+    public void update(Principal principal, Integer fieldPosition, FieldDto fieldDto) {
+        Field field = getField(principal.getName(), fieldPosition);
         deleteDependEntities(field);
         Field newField = mapper.mapToFieldEntity(fieldDto);
         newField.setId(field.getId());
         fieldRepository.save(newField);
         saveFieldOptions(newField);
+    }
+
+    private List<Field> getAllField(Principal principal) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
+        return questionnaire.isPresent()
+                ? fieldRepository.findAllByQuestionnaire_Id(questionnaire.get().getId())
+                : Collections.emptyList();
     }
 
     private void deleteDependEntities(Field field) {
@@ -81,8 +99,8 @@ public class FieldService {
         }
     }
 
-    private Field getField(UUID currentUserId, Integer fieldPosition) {
-        List<Field> fields = getQuestionnaireFields(currentUserId, fieldPosition);
+    private Field getField(String currentUserEmail, Integer fieldPosition) {
+        List<Field> fields = getQuestionnaireFields(currentUserEmail, fieldPosition);
         return fields.get(fieldPosition - 1);
     }
 
@@ -108,8 +126,8 @@ public class FieldService {
         return field.getFieldType() == FieldType.COMBOBOX || field.getFieldType() == FieldType.RADIO_BUTTON;
     }
 
-    private List<Field> getQuestionnaireFields(UUID currentUserId, Integer fieldPosition) {
-        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Id(currentUserId);
+    private List<Field> getQuestionnaireFields(String currentUserEmail, Integer fieldPosition) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(currentUserEmail);
         if (questionnaire.isEmpty()) {
             throw new QuestionnaireNotExistException();
         }
@@ -120,15 +138,18 @@ public class FieldService {
         return fields;
     }
 
-    private Questionnaire getQuestionnaire(UUID currentUserId) {
-        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Id(currentUserId);
-        return questionnaire.orElseGet(() -> createQuestionnaire(currentUserId));
+    private Questionnaire getQuestionnaire(Principal principal) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
+        return questionnaire.orElseGet(() -> createQuestionnaire(principal));
     }
 
-    private Questionnaire createQuestionnaire(UUID currentUserId) {
+    private Questionnaire createQuestionnaire(Principal principal) {
         Questionnaire newQuestionnaire = new Questionnaire();
-        newQuestionnaire.setUser(userRepository.findById(currentUserId).get());
+        User user = userRepository.findByEmail(principal.getName());
+        user.setQuestionnaire(newQuestionnaire);
+        newQuestionnaire.setUser(user);
         questionnaireRepository.save(newQuestionnaire);
+        userRepository.save(user);
         return newQuestionnaire;
     }
 }

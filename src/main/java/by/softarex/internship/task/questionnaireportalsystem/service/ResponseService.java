@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,14 +27,14 @@ import java.util.stream.Collectors;
 @Service
 @Scope("singleton")
 @AllArgsConstructor
-public class RepositoryService {
+public class ResponseService {
     private final ResponseRepository responseRepository;
     private final QuestionnaireRepository questionnaireRepository;
     private final FieldRepository fieldRepository;
     private final EntityMapper entityMapper;
 
-    public Page<ResponseDto> findAllByUserId(UUID currentUserId, Pageable pageable) {
-        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Id(currentUserId);
+    public Page<ResponseDto> findAllByUserId(Principal principal, Pageable pageable) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
         List<Field> fieldList = fieldRepository.findAllByQuestionnaire_Id(questionnaire.get().getId());
         List<ResponseDto> responses = responseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get())
                 .stream()
