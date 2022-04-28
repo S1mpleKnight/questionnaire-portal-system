@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Scope("singleton")
 @AllArgsConstructor
 public class EntityMapper {
-    private final static String FIELD_OPTIONS_DELIMITER = " ,";
+    private final static String FIELD_OPTIONS_DELIMITER = "~!@#%&_&%#@!~";
     private PasswordEncoder passwordEncoder;
 
     public FieldDto mapToFieldDto(Field field) {
@@ -34,7 +34,7 @@ public class EntityMapper {
         if (field.getFieldType() == FieldType.COMBOBOX || field.getFieldType() == FieldType.RADIO_BUTTON) {
             fieldDto.setFieldOptions(field.getOptions()
                     .stream()
-                    .map(FieldOption::toString)
+                    .map(FieldOption::getValue)
                     .collect(Collectors.joining(FIELD_OPTIONS_DELIMITER)));
         }
         return fieldDto;
