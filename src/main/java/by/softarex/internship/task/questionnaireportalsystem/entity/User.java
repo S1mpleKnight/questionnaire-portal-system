@@ -34,8 +34,7 @@ public class User {
     private String phone;
     @Column(name = "password_hash")
     private String passwordHash;
-    @OneToOne
-    @JoinColumn(name = "questionnaire_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "user")
     @ToString.Exclude
     private Questionnaire questionnaire;
 }

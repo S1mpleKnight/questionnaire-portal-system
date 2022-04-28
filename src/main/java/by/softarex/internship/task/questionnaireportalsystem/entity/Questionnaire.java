@@ -1,6 +1,7 @@
 package by.softarex.internship.task.questionnaireportalsystem.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
@@ -10,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -29,8 +31,9 @@ public class Questionnaire {
     )
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
-    @OneToOne(mappedBy = "questionnaire")
+    @OneToOne
     @ToString.Exclude
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "questionnaire")
     @ToString.Exclude
