@@ -13,7 +13,7 @@ import javax.validation.constraints.Pattern;
 public class FieldDto {
     @NotBlank(message = "Enter a valid label")
     private String label;
-    private boolean isActive;
+    private boolean active;
     private boolean required;
     @NotBlank(message = "Select a field type")
     @Pattern(regexp = "[A-Z_]{4,16}", message = "Select valid field type")
