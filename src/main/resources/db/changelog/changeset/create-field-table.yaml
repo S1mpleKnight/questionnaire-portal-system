@@ -24,3 +24,6 @@ databaseChangeLog:
               - column:
                   name: field_type
                   type: varchar(16)
+              - column:
+                  name: position
+                  type: smallint

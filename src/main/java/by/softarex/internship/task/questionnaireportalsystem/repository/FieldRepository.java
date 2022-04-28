@@ -1,6 +1,7 @@
 package by.softarex.internship.task.questionnaireportalsystem.repository;
 
 import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
+import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface FieldRepository extends JpaRepository<Field, UUID> {
-    List<Field> findAllByQuestionnaire_Id(UUID questionnaireId);
+    List<Field> findAllByQuestionnaire_IdOrderByPositionAsc(UUID questionnaireId);
+
+    Integer countAllByQuestionnaire(Questionnaire questionnaire);
 }

@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,12 +43,18 @@ public class FieldService {
 
     public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
         List<Field> fields = getAllField(principal);
-        return new PageImpl<>(fields.stream().map(mapper::mapToFieldDto).collect(Collectors.toList()), pageable, fields.size());
+        return new PageImpl<>(fields
+                .stream()
+                .map(mapper::mapToFieldDto)
+                .collect(Collectors.toList()), pageable, fields.size());
     }
 
     public List<FieldDto> findAllByUserEmail(Principal principal) {
         List<Field> fields = getAllField(principal);
-        return fields.stream().map(mapper::mapToFieldDto).collect(Collectors.toList());
+        return fields
+                .stream()
+                .map(mapper::mapToFieldDto)
+                .collect(Collectors.toList());
     }
 
     public FieldDto getFieldDto(Principal principal, Integer fieldPosition) {
@@ -58,6 +65,7 @@ public class FieldService {
     public void save(Principal principal, FieldDto fieldDto) {
         Questionnaire questionnaire = getQuestionnaire(principal);
         Field field = mapper.mapToFieldEntity(fieldDto);
+        field.setPosition(fieldRepository.countAllByQuestionnaire(questionnaire));
         field.setQuestionnaire(questionnaire);
         fieldRepository.save(field);
         saveFieldOptions(field);
@@ -65,25 +73,38 @@ public class FieldService {
 
     @Transactional
     public void delete(Principal principal, Integer fieldPosition) {
-        Field field = getField(principal.getName(), fieldPosition);
+        Field field = getField(principal.getName(), fieldPosition - 1);
         deleteDependEntities(field);
+        List<Field> fields = getAllField(principal);
+        fields = fields.stream()
+                .filter(f -> f.getPosition() > fieldPosition - 1)
+                .peek(f -> f.setPosition(f.getPosition() - 1))
+                .collect(Collectors.toList());
         fieldRepository.delete(field);
+        fieldRepository.saveAll(fields);
     }
 
     @Transactional
     public void update(Principal principal, Integer fieldPosition, FieldDto fieldDto) {
-        Field field = getField(principal.getName(), fieldPosition);
-        deleteDependEntities(field);
-        Field newField = mapper.mapToFieldEntity(fieldDto);
-        newField.setId(field.getId());
+        Field field = getField(principal.getName(), fieldPosition - 1);
+        Field newField = updateOldFieldData(fieldDto, field);
         fieldRepository.save(newField);
         saveFieldOptions(newField);
+    }
+
+    private Field updateOldFieldData(FieldDto fieldDto, Field field) {
+        deleteDependEntities(field);
+        Field newField = mapper.mapToFieldEntity(fieldDto);
+        newField.setPosition(field.getPosition());
+        newField.setId(field.getId());
+        newField.setQuestionnaire(field.getQuestionnaire());
+        return newField;
     }
 
     private List<Field> getAllField(Principal principal) {
         Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
         return questionnaire.isPresent()
-                ? fieldRepository.findAllByQuestionnaire_Id(questionnaire.get().getId())
+                ? fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId())
                 : Collections.emptyList();
     }
 
@@ -101,7 +122,7 @@ public class FieldService {
 
     private Field getField(String currentUserEmail, Integer fieldPosition) {
         List<Field> fields = getQuestionnaireFields(currentUserEmail, fieldPosition);
-        return fields.get(fieldPosition - 1);
+        return fields.stream().filter(f -> Objects.equals(f.getPosition(), fieldPosition)).findFirst().get();
     }
 
     private void deleteFieldOptions(Field field) {
@@ -131,9 +152,9 @@ public class FieldService {
         if (questionnaire.isEmpty()) {
             throw new QuestionnaireNotExistException();
         }
-        List<Field> fields = fieldRepository.findAllByQuestionnaire_Id(questionnaire.get().getId());
-        if (fields.size() < fieldPosition) {
-            throw new FieldNotExistException(fieldPosition);
+        List<Field> fields = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId());
+        if (fields.size() <= fieldPosition) {
+            throw new FieldNotExistException(fieldPosition + 1);
         }
         return fields;
     }

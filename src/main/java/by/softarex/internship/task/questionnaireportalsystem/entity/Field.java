@@ -35,6 +35,7 @@ public class Field {
     private boolean isActive;
     private boolean required;
     private String label;
+    private Integer position;
     private FieldType fieldType;
     @OneToMany(mappedBy = "field")
     @ToString.Exclude

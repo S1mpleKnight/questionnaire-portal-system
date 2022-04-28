@@ -35,7 +35,7 @@ public class ResponseService {
 
     public Page<ResponseDto> findAllByUserId(Principal principal, Pageable pageable) {
         Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
-        List<Field> fieldList = fieldRepository.findAllByQuestionnaire_Id(questionnaire.get().getId());
+        List<Field> fieldList = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId());
         List<ResponseDto> responses = responseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get())
                 .stream()
                 .map(r -> entityMapper.mapToResponseDto(r, fieldList))
@@ -48,7 +48,7 @@ public class ResponseService {
             throw new QuestionnaireNotExistException();
         }
         Questionnaire questionnaire = questionnaireRepository.findById(questionnaireId).get();
-        List<Field> fields = fieldRepository.findAllByQuestionnaire_Id(questionnaireId);
+        List<Field> fields = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaireId);
         List<Response> responses = getCreatedResponses(responseDtos, questionnaire, fields);
         responseRepository.saveAll(responses);
     }
