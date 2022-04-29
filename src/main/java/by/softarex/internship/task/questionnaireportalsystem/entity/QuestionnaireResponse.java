@@ -20,15 +20,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "responses")
-public class QuestionnaireResponse {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+public class QuestionnaireResponse extends UuidEntity{
     private UUID answerId;
     private String value;
     @ManyToOne(fetch = FetchType.LAZY)

@@ -16,22 +16,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @ToString
 @Getter
 @Setter
 @Entity
 @Table(name = "fields")
-public class Field {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+public class Field extends UuidEntity{
     @Column(name = "is_active")
     private boolean isActive;
     private boolean required;
@@ -40,7 +31,7 @@ public class Field {
     private FieldType fieldType;
     @OneToMany(mappedBy = "field")
     @ToString.Exclude
-    private List<QuestionnaireResponse> respons;
+    private List<QuestionnaireResponse> questionnaireResponses;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "field")
     @ToString.Exclude
     private Set<FieldOption> options;
