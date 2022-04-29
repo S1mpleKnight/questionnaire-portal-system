@@ -1,15 +1,16 @@
 package by.softarex.internship.task.questionnaireportalsystem.service;
 
-import by.softarex.internship.task.questionnaireportalsystem.dto.ResponseDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.QuestionnaireResponseDto;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
-import by.softarex.internship.task.questionnaireportalsystem.entity.Response;
+import by.softarex.internship.task.questionnaireportalsystem.entity.QuestionnaireResponse;
 import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.ResponseRepository;
-import by.softarex.internship.task.questionnaireportalsystem.util.EntityMapper;
+import by.softarex.internship.task.questionnaireportalsystem.util.FieldEntityMapper;
+import by.softarex.internship.task.questionnaireportalsystem.util.QuestionnaireResponseEntityMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -31,51 +32,51 @@ public class ResponseService {
     private final ResponseRepository responseRepository;
     private final QuestionnaireRepository questionnaireRepository;
     private final FieldRepository fieldRepository;
-    private final EntityMapper entityMapper;
+    private final QuestionnaireResponseEntityMapper questionnaireResponseEntityMapper;
 
-    public Page<ResponseDto> findAllByUserId(Principal principal, Pageable pageable) {
+    public Page<QuestionnaireResponseDto> findAllByUserId(Principal principal, Pageable pageable) {
         Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
         List<Field> fieldList = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId());
-        List<ResponseDto> responses = responseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get())
+        List<QuestionnaireResponseDto> responses = responseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get())
                 .stream()
-                .map(r -> entityMapper.mapToResponseDto(r, fieldList))
+                .map(r -> questionnaireResponseEntityMapper.toResponseDto(r, fieldList))
                 .collect(Collectors.toList());
         return new PageImpl<>(responses, pageable, responses.size());
     }
 
-    public void save(List<ResponseDto> responseDtos, UUID questionnaireId) {
+    public void save(List<QuestionnaireResponseDto> questionnaireResponseDtos, UUID questionnaireId) {
         if (!questionnaireRepository.existsById(questionnaireId)) {
             throw new QuestionnaireNotExistException();
         }
         Questionnaire questionnaire = questionnaireRepository.findById(questionnaireId).get();
         List<Field> fields = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaireId);
-        List<Response> responses = getCreatedResponses(responseDtos, questionnaire, fields);
-        responseRepository.saveAll(responses);
+        List<QuestionnaireResponse> respons = getCreatedResponses(questionnaireResponseDtos, questionnaire, fields);
+        responseRepository.saveAll(respons);
     }
 
-    private List<Response> getCreatedResponses(List<ResponseDto> responseDtos, Questionnaire questionnaire, List<Field> fields) {
-        List<Response> responses = new ArrayList<>();
-        for (ResponseDto responseDto : responseDtos) {
-            createResponse(questionnaire, fields, responses, responseDto);
+    private List<QuestionnaireResponse> getCreatedResponses(List<QuestionnaireResponseDto> questionnaireResponseDtos, Questionnaire questionnaire, List<Field> fields) {
+        List<QuestionnaireResponse> respons = new ArrayList<>();
+        for (QuestionnaireResponseDto questionnaireResponseDto : questionnaireResponseDtos) {
+            createResponse(questionnaire, fields, respons, questionnaireResponseDto);
         }
-        return responses;
+        return respons;
     }
 
-    private void createResponse(Questionnaire questionnaire, List<Field> fields, List<Response> responses, ResponseDto responseDto) {
-        Response response = new Response();
-        response.setValue(responseDto.getValue());
-        setCorrespondField(fields, responseDto, response);
-        response.setAnswerId(getAnswerId());
-        response.setQuestionnaire(questionnaire);
-        responses.add(response);
+    private void createResponse(Questionnaire questionnaire, List<Field> fields, List<QuestionnaireResponse> respons, QuestionnaireResponseDto questionnaireResponseDto) {
+        QuestionnaireResponse questionnaireResponse = new QuestionnaireResponse();
+        questionnaireResponse.setValue(questionnaireResponseDto.getValue());
+        setCorrespondField(fields, questionnaireResponseDto, questionnaireResponse);
+        questionnaireResponse.setAnswerId(getAnswerId());
+        questionnaireResponse.setQuestionnaire(questionnaire);
+        respons.add(questionnaireResponse);
     }
 
-    private void setCorrespondField(List<Field> fields, ResponseDto responseDto, Response response) {
-        int fieldPos = Integer.parseInt(responseDto.getFieldPosition());
+    private void setCorrespondField(List<Field> fields, QuestionnaireResponseDto questionnaireResponseDto, QuestionnaireResponse questionnaireResponse) {
+        int fieldPos = Integer.parseInt(questionnaireResponseDto.getFieldPosition());
         if (fields.size() < fieldPos) {
             throw new FieldNotExistException(fieldPos);
         }
-        response.setField(fields.get(fieldPos - 1));
+        questionnaireResponse.setField(fields.get(fieldPos - 1));
     }
 
     private UUID getAnswerId() {

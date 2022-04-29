@@ -7,7 +7,7 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.EmailExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.InvalidPasswordException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
-import by.softarex.internship.task.questionnaireportalsystem.util.EntityMapper;
+import by.softarex.internship.task.questionnaireportalsystem.util.UserEntityMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -27,35 +28,39 @@ public class UserService implements UserDetailsService {
     private final static String MAIL_MESSAGE = "Password has been changed";
     private final static String MAIL_SUBJECT = "Security notification";
     private UserRepository userRepository;
-    private EntityMapper mapper;
+    private UserEntityMapper mapper;
     private PasswordEncoder passwordEncoder;
     private MailService mailService;
 
     public UserUpdateDto findByPrincipal(Principal principal) {
-        return mapper.mapToUserDto(userRepository.findByEmail(principal.getName()));
+        return mapper.toUserDto(userRepository.findByEmail(principal.getName()));
     }
 
-    public void save(UserDto userDto) {
-        User user = mapper.mapToUserEntity(userDto);
+    @Transactional
+    public UserUpdateDto save(UserDto userDto) {
+        User user = mapper.toUserEntity(userDto);
         if (!isNotUserExist(user.getEmail())) {
             userRepository.save(user);
         }
+        return mapper.toUserDto(user);
     }
 
-    public void update(Principal principal, UserUpdateDto userDto) {
+    @Transactional
+    public UserUpdateDto update(Principal principal, UserUpdateDto userDto) {
+        User oldData = userRepository.findByEmail(principal.getName());
         if (userDto.getEmail().equals(principal.getName()) || !isNotUserExist(userDto.getEmail())) {
-            User oldData = userRepository.findByEmail(principal.getName());
             updateUserData(userDto, oldData);
             userRepository.save(oldData);
         }
+        return mapper.toUserDto(oldData);
     }
 
-    public void changePassword(Principal principal, ChangePasswordDto passwordDto) {
+    @Transactional
+    public Boolean updatePassword(Principal principal, ChangePasswordDto passwordDto) {
         User user = userRepository.findByEmail(principal.getName());
         if (passwordEncoder.matches(passwordDto.getOldPassword(), user.getPasswordHash())) {
-            user.setPasswordHash(passwordEncoder.encode(passwordDto.getNewPassword()));
-            userRepository.save(user);
-            mailService.send(user.getEmail(), MAIL_SUBJECT, MAIL_MESSAGE);
+            changePassword(passwordDto, user);
+            return true;
         } else {
             throw new InvalidPasswordException();
         }
@@ -85,6 +90,12 @@ public class UserService implements UserDetailsService {
         oldData.setFirstname(userDto.getFirstname());
         oldData.setLastname(userDto.getLastname());
         oldData.setPhone(userDto.getPhone());
+    }
+
+    private void changePassword(ChangePasswordDto passwordDto, User user) {
+        user.setPasswordHash(passwordEncoder.encode(passwordDto.getNewPassword()));
+        userRepository.save(user);
+        mailService.send(user.getEmail(), MAIL_SUBJECT, MAIL_MESSAGE);
     }
 
     private boolean isNotUserExist(String email) {

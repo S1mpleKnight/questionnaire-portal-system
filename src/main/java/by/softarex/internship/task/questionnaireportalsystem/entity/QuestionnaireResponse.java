@@ -20,7 +20,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "responses")
-public class Response {
+public class QuestionnaireResponse {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
@@ -38,7 +38,7 @@ public class Response {
     @JoinColumn(name = "field_id")
     private Field field;
 
-    public Response(UUID answerId, String value, Field field) {
+    public QuestionnaireResponse(UUID answerId, String value, Field field) {
         this.answerId = answerId;
         this.value = value;
         this.field = field;

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ResponseDto {
+public class QuestionnaireResponseDto {
     private String value;
     private String fieldPosition;
 }

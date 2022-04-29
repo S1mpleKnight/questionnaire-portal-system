@@ -7,6 +7,7 @@ import by.softarex.internship.task.questionnaireportalsystem.exception.JwtAuthen
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -41,6 +42,12 @@ public class ExceptionHandlerController {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String unauthorized(AuthenticationException exception) {
         return exception.getMessage();
+    }
+
+    @ExceptionHandler({BadCredentialsException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String forbidden(AuthenticationException e) {
+        return e.getMessage();
     }
 
     private String takeErrorFields(BindException e) {

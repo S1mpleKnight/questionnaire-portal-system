@@ -1,7 +1,6 @@
 package by.softarex.internship.task.questionnaireportalsystem.entity;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
@@ -40,5 +39,5 @@ public class Questionnaire {
     private List<Field> fields;
     @OneToMany(mappedBy = "questionnaire")
     @ToString.Exclude
-    private List<Response> responses;
+    private List<QuestionnaireResponse> respons;
 }

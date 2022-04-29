@@ -40,7 +40,7 @@ public class Field {
     private FieldType fieldType;
     @OneToMany(mappedBy = "field")
     @ToString.Exclude
-    private List<Response> responses;
+    private List<QuestionnaireResponse> respons;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "field")
     @ToString.Exclude
     private Set<FieldOption> options;

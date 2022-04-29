@@ -5,7 +5,7 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
-import by.softarex.internship.task.questionnaireportalsystem.entity.Response;
+import by.softarex.internship.task.questionnaireportalsystem.entity.QuestionnaireResponse;
 import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
@@ -14,7 +14,7 @@ import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRep
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.ResponseRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
-import by.softarex.internship.task.questionnaireportalsystem.util.EntityMapper;
+import by.softarex.internship.task.questionnaireportalsystem.util.FieldEntityMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -39,13 +39,13 @@ public class FieldService {
     private final UserRepository userRepository;
     private final FieldOptionRepository fieldOptionRepository;
     private final ResponseRepository responseRepository;
-    private final EntityMapper mapper;
+    private final FieldEntityMapper mapper;
 
     public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
         List<Field> fields = getAllField(principal);
         return new PageImpl<>(fields
                 .stream()
-                .map(mapper::mapToFieldDto)
+                .map(mapper::toFieldDto)
                 .collect(Collectors.toList()), pageable, fields.size());
     }
 
@@ -53,52 +53,64 @@ public class FieldService {
         List<Field> fields = getAllField(principal);
         return fields
                 .stream()
-                .map(mapper::mapToFieldDto)
+                .map(mapper::toFieldDto)
                 .collect(Collectors.toList());
     }
 
     public FieldDto getFieldDto(Principal principal, Integer fieldPosition) {
-        return mapper.mapToFieldDto(getField(principal.getName(), fieldPosition));
+        return mapper.toFieldDto(getField(principal.getName(), fieldPosition));
     }
 
     @Transactional
-    public void save(Principal principal, FieldDto fieldDto) {
+    public FieldDto save(Principal principal, FieldDto fieldDto) {
         Questionnaire questionnaire = getQuestionnaire(principal);
-        Field field = mapper.mapToFieldEntity(fieldDto);
-        field.setPosition(fieldRepository.countAllByQuestionnaire(questionnaire));
-        field.setQuestionnaire(questionnaire);
+        Field field = getPreparedField(fieldDto, questionnaire);
         fieldRepository.save(field);
         saveFieldOptions(field);
+        return mapper.toFieldDto(field);
     }
 
     @Transactional
     public void delete(Principal principal, Integer fieldPosition) {
         Field field = getField(principal.getName(), fieldPosition - 1);
         deleteDependEntities(field);
-        List<Field> fields = getAllField(principal);
-        fields = fields.stream()
-                .filter(f -> f.getPosition() > fieldPosition - 1)
-                .peek(f -> f.setPosition(f.getPosition() - 1))
-                .collect(Collectors.toList());
+        List<Field> fields = calculateNewPositions(principal, fieldPosition);
         fieldRepository.delete(field);
         fieldRepository.saveAll(fields);
     }
 
     @Transactional
-    public void update(Principal principal, Integer fieldPosition, FieldDto fieldDto) {
+    public FieldDto update(Principal principal, Integer fieldPosition, FieldDto fieldDto) {
         Field field = getField(principal.getName(), fieldPosition - 1);
         Field newField = updateOldFieldData(fieldDto, field);
         fieldRepository.save(newField);
         saveFieldOptions(newField);
+        return mapper.toFieldDto(newField);
     }
 
     private Field updateOldFieldData(FieldDto fieldDto, Field field) {
         deleteDependEntities(field);
-        Field newField = mapper.mapToFieldEntity(fieldDto);
+        Field newField = mapper.toFieldEntity(fieldDto);
         newField.setPosition(field.getPosition());
         newField.setId(field.getId());
         newField.setQuestionnaire(field.getQuestionnaire());
         return newField;
+    }
+
+    private Field getPreparedField(FieldDto fieldDto, Questionnaire questionnaire) {
+        Field field = mapper.toFieldEntity(fieldDto);
+        field.setPosition(fieldRepository.countAllByQuestionnaire(questionnaire));
+        field.setQuestionnaire(questionnaire);
+        return field;
+    }
+
+    private List<Field> calculateNewPositions(Principal principal, Integer fieldPosition) {
+        List<Field> fields = getAllField(principal);
+        fields = fields.stream()
+                .filter(f -> f.getPosition() > fieldPosition - 1)
+                .peek(f -> f.setPosition(f.getPosition() - 1))
+                .collect(Collectors.toList());
+        return fields;
     }
 
     private List<Field> getAllField(Principal principal) {
@@ -114,9 +126,9 @@ public class FieldService {
     }
 
     private void deleteFieldResponses(Field field) {
-        List<Response> responses = responseRepository.findAllByField(field);
-        if (!responses.isEmpty()) {
-            responseRepository.deleteAll(responses);
+        List<QuestionnaireResponse> respons = responseRepository.findAllByField(field);
+        if (!respons.isEmpty()) {
+            responseRepository.deleteAll(respons);
         }
     }
 

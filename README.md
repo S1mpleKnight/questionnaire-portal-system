@@ -13,4 +13,4 @@ Java Spring Softarex test project
 |  Fields list page | /fields|
 |  Questionnaire page | /{:userId} |
 |  Success submit of answer | /congratulation|
-|  Responses list page | /responses|
+|  Responses list page | /respons|
