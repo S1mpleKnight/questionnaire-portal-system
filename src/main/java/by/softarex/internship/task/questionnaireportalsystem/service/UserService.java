@@ -7,7 +7,7 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.EmailExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.InvalidPasswordException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
-import by.softarex.internship.task.questionnaireportalsystem.util.EntityMapper;
+import by.softarex.internship.task.questionnaireportalsystem.util.UserEntityMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -27,40 +28,42 @@ public class UserService implements UserDetailsService {
     private final static String MAIL_MESSAGE = "Password has been changed";
     private final static String MAIL_SUBJECT = "Security notification";
     private UserRepository userRepository;
-    private EntityMapper mapper;
+    private UserEntityMapper mapper;
     private PasswordEncoder passwordEncoder;
     private MailService mailService;
 
     public UserUpdateDto findByPrincipal(Principal principal) {
-        return mapper.mapToUserDto(userRepository.findByEmail(principal.getName()));
+        return mapper.toUserDto(userRepository.findByEmail(principal.getName()));
     }
 
-    public void save(UserDto userDto) {
-        User user = mapper.mapToUserEntity(userDto);
-        if (isUserExist(user.getEmail())) {
-            throw new EmailExistException(user.getEmail());
-        } else {
+    @Transactional
+    public UserUpdateDto save(UserDto userDto) {
+        User user = mapper.toUserEntity(userDto);
+        if (!isNotUserExist(user.getEmail())) {
             userRepository.save(user);
         }
+        return mapper.toUserDto(user);
     }
 
-    public void update(Principal principal, UserUpdateDto userDto) {
-        if (isUserExist(userDto.getEmail())) {
-            User oldData = userRepository.findByEmail(principal.getName());
+    @Transactional
+    public UserUpdateDto update(Principal principal, UserUpdateDto userDto) {
+        User oldData = userRepository.findByEmail(principal.getName());
+        if (userDto.getEmail().equals(principal.getName()) || !isNotUserExist(userDto.getEmail())) {
             updateUserData(userDto, oldData);
             userRepository.save(oldData);
         }
+        return mapper.toUserDto(oldData);
     }
 
-    public void changePassword(UUID currentUserId, ChangePasswordDto changePasswordDto) {
-        User user = userRepository.findById(currentUserId).get();
-        String receivedPasswordValue = passwordEncoder.encode(changePasswordDto.getOldPassword());
-        if (user.getPasswordHash().equals(receivedPasswordValue)) {
-            user.setPasswordHash(passwordEncoder.encode(changePasswordDto.getNewPassword()));
-            userRepository.save(user);
-            mailService.send(user.getEmail(), MAIL_SUBJECT, MAIL_MESSAGE);
+    @Transactional
+    public Boolean updatePassword(Principal principal, ChangePasswordDto passwordDto) {
+        User user = userRepository.findByEmail(principal.getName());
+        if (passwordEncoder.matches(passwordDto.getOldPassword(), user.getPasswordHash())) {
+            changePassword(passwordDto, user);
+            return true;
+        } else {
+            throw new InvalidPasswordException();
         }
-        throw new InvalidPasswordException();
     }
 
     public UUID findIdByEmail(String email) {
@@ -89,8 +92,17 @@ public class UserService implements UserDetailsService {
         oldData.setPhone(userDto.getPhone());
     }
 
-    private boolean isUserExist(String email) {
-        return isEmailExist(email);
+    private void changePassword(ChangePasswordDto passwordDto, User user) {
+        user.setPasswordHash(passwordEncoder.encode(passwordDto.getNewPassword()));
+        userRepository.save(user);
+        mailService.send(user.getEmail(), MAIL_SUBJECT, MAIL_MESSAGE);
+    }
+
+    private boolean isNotUserExist(String email) {
+        if (isEmailExist(email)) {
+            throw new EmailExistException(email);
+        }
+        return false;
     }
 
     private boolean isEmailExist(String email) {

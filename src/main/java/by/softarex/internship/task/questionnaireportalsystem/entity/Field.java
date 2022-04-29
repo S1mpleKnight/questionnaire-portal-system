@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@ToString
 @Getter
 @Setter
 @Entity
@@ -35,10 +36,11 @@ public class Field {
     private boolean isActive;
     private boolean required;
     private String label;
+    private Integer position;
     private FieldType fieldType;
     @OneToMany(mappedBy = "field")
     @ToString.Exclude
-    private List<Response> responses;
+    private List<QuestionnaireResponse> respons;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "field")
     @ToString.Exclude
     private Set<FieldOption> options;

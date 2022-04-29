@@ -9,8 +9,8 @@ Java Spring Softarex test project
 |  Log out | /logout|
 |  Sign up | /register|
 |  Edit Profile | /profile|
-|  Change Password | /change-password|
+|  Change Password | /password|
 |  Fields list page | /fields|
 |  Questionnaire page | /{:userId} |
 |  Success submit of answer | /congratulation|
-|  Responses list page | /responses|
+|  Responses list page | /respons|

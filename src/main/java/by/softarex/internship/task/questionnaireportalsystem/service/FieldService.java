@@ -5,7 +5,8 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
-import by.softarex.internship.task.questionnaireportalsystem.entity.Response;
+import by.softarex.internship.task.questionnaireportalsystem.entity.QuestionnaireResponse;
+import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldOptionRepository;
@@ -13,18 +14,20 @@ import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRep
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.ResponseRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
-import by.softarex.internship.task.questionnaireportalsystem.util.EntityMapper;
+import by.softarex.internship.task.questionnaireportalsystem.util.FieldEntityMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,37 +39,85 @@ public class FieldService {
     private final UserRepository userRepository;
     private final FieldOptionRepository fieldOptionRepository;
     private final ResponseRepository responseRepository;
-    private final EntityMapper mapper;
+    private final FieldEntityMapper mapper;
 
-    public Page<FieldDto> findAllByUserId(UUID UserId, Pageable pageable) {
-        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Id(UserId);
-        List<Field> fields = questionnaire.isPresent()
-                ? fieldRepository.findAllByQuestionnaire_Id(questionnaire.get().getId())
-                : Collections.emptyList();
-        return new PageImpl<>(fields.stream().map(mapper::mapToFieldDto).collect(Collectors.toList()), pageable, fields.size());
+    public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
+        List<Field> fields = getAllField(principal);
+        return new PageImpl<>(fields
+                .stream()
+                .map(mapper::toFieldDto)
+                .collect(Collectors.toList()), pageable, fields.size());
     }
 
-    public void save(UUID currentUserId, FieldDto fieldDto) {
-        Questionnaire questionnaire = getQuestionnaire(currentUserId);
-        Field field = mapper.mapToFieldEntity(fieldDto);
-        field.setQuestionnaire(questionnaire);
+    public List<FieldDto> findAllByUserEmail(Principal principal) {
+        List<Field> fields = getAllField(principal);
+        return fields
+                .stream()
+                .map(mapper::toFieldDto)
+                .collect(Collectors.toList());
+    }
+
+    public FieldDto getFieldDto(Principal principal, Integer fieldPosition) {
+        return mapper.toFieldDto(getField(principal.getName(), fieldPosition));
+    }
+
+    @Transactional
+    public FieldDto save(Principal principal, FieldDto fieldDto) {
+        Questionnaire questionnaire = getQuestionnaire(principal);
+        Field field = getPreparedField(fieldDto, questionnaire);
         fieldRepository.save(field);
         saveFieldOptions(field);
+        return mapper.toFieldDto(field);
     }
 
-    public void delete(UUID currentUserId, Integer fieldPosition) {
-        Field field = getField(currentUserId, fieldPosition);
+    @Transactional
+    public void delete(Principal principal, Integer fieldPosition) {
+        Field field = getField(principal.getName(), fieldPosition - 1);
         deleteDependEntities(field);
+        List<Field> fields = calculateNewPositions(principal, fieldPosition);
         fieldRepository.delete(field);
+        fieldRepository.saveAll(fields);
     }
 
-    public void update(UUID currentUserId, Integer fieldPosition, FieldDto fieldDto) {
-        Field field = getField(currentUserId, fieldPosition);
-        deleteDependEntities(field);
-        Field newField = mapper.mapToFieldEntity(fieldDto);
-        newField.setId(field.getId());
+    @Transactional
+    public FieldDto update(Principal principal, Integer fieldPosition, FieldDto fieldDto) {
+        Field field = getField(principal.getName(), fieldPosition - 1);
+        Field newField = updateOldFieldData(fieldDto, field);
         fieldRepository.save(newField);
         saveFieldOptions(newField);
+        return mapper.toFieldDto(newField);
+    }
+
+    private Field updateOldFieldData(FieldDto fieldDto, Field field) {
+        deleteDependEntities(field);
+        Field newField = mapper.toFieldEntity(fieldDto);
+        newField.setPosition(field.getPosition());
+        newField.setId(field.getId());
+        newField.setQuestionnaire(field.getQuestionnaire());
+        return newField;
+    }
+
+    private Field getPreparedField(FieldDto fieldDto, Questionnaire questionnaire) {
+        Field field = mapper.toFieldEntity(fieldDto);
+        field.setPosition(fieldRepository.countAllByQuestionnaire(questionnaire));
+        field.setQuestionnaire(questionnaire);
+        return field;
+    }
+
+    private List<Field> calculateNewPositions(Principal principal, Integer fieldPosition) {
+        List<Field> fields = getAllField(principal);
+        fields = fields.stream()
+                .filter(f -> f.getPosition() > fieldPosition - 1)
+                .peek(f -> f.setPosition(f.getPosition() - 1))
+                .collect(Collectors.toList());
+        return fields;
+    }
+
+    private List<Field> getAllField(Principal principal) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
+        return questionnaire.isPresent()
+                ? fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId())
+                : Collections.emptyList();
     }
 
     private void deleteDependEntities(Field field) {
@@ -75,15 +126,15 @@ public class FieldService {
     }
 
     private void deleteFieldResponses(Field field) {
-        List<Response> responses = responseRepository.findAllByField(field);
-        if (!responses.isEmpty()) {
-            responseRepository.deleteAll(responses);
+        List<QuestionnaireResponse> respons = responseRepository.findAllByField(field);
+        if (!respons.isEmpty()) {
+            responseRepository.deleteAll(respons);
         }
     }
 
-    private Field getField(UUID currentUserId, Integer fieldPosition) {
-        List<Field> fields = getQuestionnaireFields(currentUserId, fieldPosition);
-        return fields.get(fieldPosition - 1);
+    private Field getField(String currentUserEmail, Integer fieldPosition) {
+        List<Field> fields = getQuestionnaireFields(currentUserEmail, fieldPosition);
+        return fields.stream().filter(f -> Objects.equals(f.getPosition(), fieldPosition)).findFirst().get();
     }
 
     private void deleteFieldOptions(Field field) {
@@ -108,27 +159,30 @@ public class FieldService {
         return field.getFieldType() == FieldType.COMBOBOX || field.getFieldType() == FieldType.RADIO_BUTTON;
     }
 
-    private List<Field> getQuestionnaireFields(UUID currentUserId, Integer fieldPosition) {
-        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Id(currentUserId);
+    private List<Field> getQuestionnaireFields(String currentUserEmail, Integer fieldPosition) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(currentUserEmail);
         if (questionnaire.isEmpty()) {
             throw new QuestionnaireNotExistException();
         }
-        List<Field> fields = fieldRepository.findAllByQuestionnaire_Id(questionnaire.get().getId());
-        if (fields.size() < fieldPosition) {
-            throw new FieldNotExistException(fieldPosition);
+        List<Field> fields = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId());
+        if (fields.size() <= fieldPosition) {
+            throw new FieldNotExistException(fieldPosition + 1);
         }
         return fields;
     }
 
-    private Questionnaire getQuestionnaire(UUID currentUserId) {
-        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Id(currentUserId);
-        return questionnaire.orElseGet(() -> createQuestionnaire(currentUserId));
+    private Questionnaire getQuestionnaire(Principal principal) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
+        return questionnaire.orElseGet(() -> createQuestionnaire(principal));
     }
 
-    private Questionnaire createQuestionnaire(UUID currentUserId) {
+    private Questionnaire createQuestionnaire(Principal principal) {
         Questionnaire newQuestionnaire = new Questionnaire();
-        newQuestionnaire.setUser(userRepository.findById(currentUserId).get());
+        User user = userRepository.findByEmail(principal.getName());
+        user.setQuestionnaire(newQuestionnaire);
+        newQuestionnaire.setUser(user);
         questionnaireRepository.save(newQuestionnaire);
+        userRepository.save(user);
         return newQuestionnaire;
     }
 }
