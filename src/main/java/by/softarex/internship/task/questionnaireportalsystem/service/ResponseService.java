@@ -37,11 +37,11 @@ public class ResponseService {
     public Page<QuestionnaireResponseDto> findAllByUserId(Principal principal, Pageable pageable) {
         Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
         List<Field> fieldList = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId());
-        List<QuestionnaireResponseDto> responses = responseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get())
+        List<QuestionnaireResponseDto> questionnaireResponses = responseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get())
                 .stream()
                 .map(r -> questionnaireResponseEntityMapper.toResponseDto(r, fieldList))
                 .collect(Collectors.toList());
-        return new PageImpl<>(responses, pageable, responses.size());
+        return new PageImpl<>(questionnaireResponses, pageable, questionnaireResponses.size());
     }
 
     public void save(List<QuestionnaireResponseDto> questionnaireResponseDtos, UUID questionnaireId) {
@@ -50,16 +50,16 @@ public class ResponseService {
         }
         Questionnaire questionnaire = questionnaireRepository.findById(questionnaireId).get();
         List<Field> fields = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaireId);
-        List<QuestionnaireResponse> respons = getCreatedResponses(questionnaireResponseDtos, questionnaire, fields);
-        responseRepository.saveAll(respons);
+        List<QuestionnaireResponse> questionnaireResponses = getCreatedResponses(questionnaireResponseDtos, questionnaire, fields);
+        responseRepository.saveAll(questionnaireResponses);
     }
 
     private List<QuestionnaireResponse> getCreatedResponses(List<QuestionnaireResponseDto> questionnaireResponseDtos, Questionnaire questionnaire, List<Field> fields) {
-        List<QuestionnaireResponse> respons = new ArrayList<>();
+        List<QuestionnaireResponse> questionnaireResponses = new ArrayList<>();
         for (QuestionnaireResponseDto questionnaireResponseDto : questionnaireResponseDtos) {
-            createResponse(questionnaire, fields, respons, questionnaireResponseDto);
+            createResponse(questionnaire, fields, questionnaireResponses, questionnaireResponseDto);
         }
-        return respons;
+        return questionnaireResponses;
     }
 
     private void createResponse(Questionnaire questionnaire, List<Field> fields, List<QuestionnaireResponse> respons, QuestionnaireResponseDto questionnaireResponseDto) {
