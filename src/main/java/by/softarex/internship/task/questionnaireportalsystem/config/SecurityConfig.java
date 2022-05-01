@@ -21,10 +21,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String[] AUTH_WHITELIST = {
-            "/*",
-            "/register",
-            "/login",
-            "/logout"
+            "/api/responses/*",
+            "/api/register",
+            "/api/login",
+            "/api/logout"
     };
     private final PasswordEncoder encoder;
     private final JwtConfigurer jwtConfigurer;
