@@ -12,7 +12,7 @@ import by.softarex.internship.task.questionnaireportalsystem.exception.Questionn
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldOptionRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
-import by.softarex.internship.task.questionnaireportalsystem.repository.ResponseRepository;
+import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireResponseRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
 import by.softarex.internship.task.questionnaireportalsystem.util.FieldEntityMapper;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class FieldService {
     private final QuestionnaireRepository questionnaireRepository;
     private final UserRepository userRepository;
     private final FieldOptionRepository fieldOptionRepository;
-    private final ResponseRepository responseRepository;
+    private final QuestionnaireResponseRepository questionnaireResponseRepository;
     private final FieldEntityMapper mapper;
 
     public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
@@ -126,9 +126,9 @@ public class FieldService {
     }
 
     private void deleteFieldResponses(Field field) {
-        List<QuestionnaireResponse> respons = responseRepository.findAllByField(field);
-        if (!respons.isEmpty()) {
-            responseRepository.deleteAll(respons);
+        List<QuestionnaireResponse> responses = questionnaireResponseRepository.findAllByField(field);
+        if (!responses.isEmpty()) {
+            questionnaireResponseRepository.deleteAll(responses);
         }
     }
 

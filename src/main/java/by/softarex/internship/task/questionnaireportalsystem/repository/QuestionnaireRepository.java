@@ -10,4 +10,6 @@ import java.util.UUID;
 @Repository
 public interface QuestionnaireRepository extends CrudRepository<Questionnaire, UUID> {
     Optional<Questionnaire> findByUser_Email(String email);
+
+    Optional<Questionnaire> findByUser_Id(UUID uuid);
 }

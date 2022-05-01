@@ -34,7 +34,8 @@ public class FieldController {
             Principal principal,
             @RequestParam(name = "page", required = false)
             @Parameter (description = "The number of the page") Integer page,
-            @RequestParam(name = "size", required = false) @Parameter(description = "The size of the page") Integer size) {
+            @RequestParam(name = "size", required = false) @Parameter(description = "The size of the page") Integer size
+    ) {
         if (page != null && size != null) {
             return ResponseEntity.ok(fieldService.findAllByUserEmail(principal, PageRequest.of(page, size)));
         } else {
