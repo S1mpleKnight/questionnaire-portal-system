@@ -4,10 +4,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import java.util.Objects;
+
 @Getter
 @Setter
 @Schema(description = "Questionnaire response entity")
 public class QuestionnaireResponseDto {
+    @NotBlank
     private String value;
-    private String fieldPosition;
+    @Positive
+    private Integer position;
 }
