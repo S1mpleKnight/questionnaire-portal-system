@@ -25,8 +25,10 @@ import java.util.UUID;
 @Scope("singleton")
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
-    private final static String MAIL_MESSAGE = "Password has been changed";
-    private final static String MAIL_SUBJECT = "Security notification";
+    private final static String PASSWORD_MAIL_MESSAGE = "Password has been changed";
+    private final static String PASSWORD_MAIL_SUBJECT = "Security notification";
+    private final static String REGISTRATION_MAIL_MESSAGE = "You have been registered in the questionnaire portal system";
+    private final static String REGISTRATION_MAIL_SUBJECT = "Portal registration";
     private UserRepository userRepository;
     private UserEntityMapper mapper;
     private PasswordEncoder passwordEncoder;
@@ -42,6 +44,7 @@ public class UserService implements UserDetailsService {
         if (!isNotUserExist(user.getEmail())) {
             userRepository.save(user);
         }
+        mailService.send(user.getEmail(), REGISTRATION_MAIL_SUBJECT, REGISTRATION_MAIL_MESSAGE);
         return mapper.toUserDto(user);
     }
 
@@ -95,7 +98,7 @@ public class UserService implements UserDetailsService {
     private void changePassword(ChangePasswordDto passwordDto, User user) {
         user.setPasswordHash(passwordEncoder.encode(passwordDto.getNewPassword()));
         userRepository.save(user);
-        mailService.send(user.getEmail(), MAIL_SUBJECT, MAIL_MESSAGE);
+        mailService.send(user.getEmail(), PASSWORD_MAIL_SUBJECT, PASSWORD_MAIL_MESSAGE);
     }
 
     private boolean isNotUserExist(String email) {

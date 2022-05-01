@@ -6,8 +6,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,7 +30,7 @@ public class QuestionnaireResponseController {
     @PostMapping("/api/responses/{userId}")
     public ResponseEntity<List<QuestionnaireResponseDto>> create(
             @Valid @RequestBody @Parameter(description = "New responses data") List<QuestionnaireResponseDto> responses,
-            @PathVariable(name = "userId") UUID userId
+            @PathVariable(name = "userId") @Parameter(description = "Questionnaire creator's id") UUID userId
     ) {
         return ResponseEntity.ok(questionnaireResponseService.saveAll(responses, userId));
     }
@@ -42,7 +40,7 @@ public class QuestionnaireResponseController {
     public ResponseEntity<?> findAll(
             Principal principal,
             @RequestParam(name = "page", required = false)
-            @Parameter (description = "The number of the page") Integer page,
+            @Parameter(description = "The number of the page") Integer page,
             @RequestParam(name = "size", required = false)
             @Parameter(description = "The size of the page") Integer size
     ) {

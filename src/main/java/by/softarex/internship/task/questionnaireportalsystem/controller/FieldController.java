@@ -33,7 +33,7 @@ public class FieldController {
     public ResponseEntity<?> getAllFields(
             Principal principal,
             @RequestParam(name = "page", required = false)
-            @Parameter (description = "The number of the page") Integer page,
+            @Parameter(description = "The number of the page") Integer page,
             @RequestParam(name = "size", required = false) @Parameter(description = "The size of the page") Integer size
     ) {
         if (page != null && size != null) {

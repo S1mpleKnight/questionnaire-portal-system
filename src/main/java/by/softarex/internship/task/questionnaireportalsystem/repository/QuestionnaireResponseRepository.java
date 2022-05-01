@@ -17,7 +17,7 @@ public interface QuestionnaireResponseRepository extends JpaRepository<Questionn
     Boolean existsByAnswerId(UUID answerId);
 
     @Query(
-            value = "SELECT * FROM responses r WHERE r.questionnaire_id = ?1 ORDER BY answer_id, creation_date ASC, position ASC",
+            value = "SELECT * FROM responses r WHERE r.questionnaire_id = ?1 ORDER BY answer_id, creation_date DESC, position ASC",
             nativeQuery = true
     )
     List<QuestionnaireResponse> findAllSorted(UUID questionnaireId);
