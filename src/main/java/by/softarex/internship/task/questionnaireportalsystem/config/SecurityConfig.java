@@ -24,7 +24,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/responses/*",
             "/api/register",
             "/api/login",
-            "/api/logout"
+            "/api/logout",
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
     };
     private final PasswordEncoder encoder;
     private final JwtConfigurer jwtConfigurer;
@@ -62,11 +71,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticated()
             .and()
                 .apply(jwtConfigurer);
-    }
-
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v2/api-docs/**");
     }
 }
 
