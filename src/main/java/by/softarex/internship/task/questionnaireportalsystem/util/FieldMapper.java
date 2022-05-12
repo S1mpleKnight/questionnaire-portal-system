@@ -1,25 +1,16 @@
 package by.softarex.internship.task.questionnaireportalsystem.util;
 
 import by.softarex.internship.task.questionnaireportalsystem.dto.FieldDto;
-import by.softarex.internship.task.questionnaireportalsystem.dto.QuestionnaireResponseDto;
-import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
-import by.softarex.internship.task.questionnaireportalsystem.dto.UserUpdateDto;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
-import by.softarex.internship.task.questionnaireportalsystem.entity.QuestionnaireResponse;
-import by.softarex.internship.task.questionnaireportalsystem.entity.User;
-import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Scope;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class FieldEntityMapper {
+public class FieldMapper {
     private final static String FIELD_OPTIONS_DELIMITER = "~!@#%&_&%#@!~";
 
     public FieldDto toFieldDto(Field field) {

@@ -14,7 +14,7 @@ import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRep
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireResponseRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
-import by.softarex.internship.task.questionnaireportalsystem.util.FieldEntityMapper;
+import by.softarex.internship.task.questionnaireportalsystem.util.FieldMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -39,7 +39,7 @@ public class FieldService {
     private final UserRepository userRepository;
     private final FieldOptionRepository fieldOptionRepository;
     private final QuestionnaireResponseRepository questionnaireResponseRepository;
-    private final FieldEntityMapper mapper;
+    private final FieldMapper mapper;
 
     public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
         List<Field> fields = getAllField(principal);
@@ -58,7 +58,7 @@ public class FieldService {
     }
 
     public FieldDto getFieldDto(Principal principal, Integer fieldPosition) {
-        return mapper.toFieldDto(getField(principal.getName(), fieldPosition));
+        return mapper.toFieldDto(getField(principal.getName(), fieldPosition - 1));
     }
 
     @Transactional
@@ -71,12 +71,14 @@ public class FieldService {
     }
 
     @Transactional
-    public void delete(Principal principal, Integer fieldPosition) {
+    public FieldDto delete(Principal principal, Integer fieldPosition) {
         Field field = getField(principal.getName(), fieldPosition - 1);
+        FieldDto result = getFieldDto(principal, fieldPosition);
         deleteDependEntities(field);
         List<Field> fields = calculateNewPositions(principal, fieldPosition);
         fieldRepository.delete(field);
         fieldRepository.saveAll(fields);
+        return result;
     }
 
     @Transactional
@@ -162,7 +164,7 @@ public class FieldService {
     private List<Field> getQuestionnaireFields(String currentUserEmail, Integer fieldPosition) {
         Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(currentUserEmail);
         if (questionnaire.isEmpty()) {
-            throw new QuestionnaireNotExistException();
+            throw new QuestionnaireNotExistException("There are not questionnaire & fields for the current user");
         }
         List<Field> fields = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId());
         if (fields.size() <= fieldPosition) {
@@ -178,7 +180,7 @@ public class FieldService {
 
     private Questionnaire createQuestionnaire(Principal principal) {
         Questionnaire newQuestionnaire = new Questionnaire();
-        User user = userRepository.findByEmail(principal.getName());
+        User user = userRepository.findByEmail(principal.getName()).get();
         user.setQuestionnaire(newQuestionnaire);
         newQuestionnaire.setUser(user);
         questionnaireRepository.save(newQuestionnaire);

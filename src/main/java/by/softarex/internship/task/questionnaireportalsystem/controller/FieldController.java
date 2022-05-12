@@ -32,8 +32,8 @@ public class FieldController {
     @GetMapping
     public ResponseEntity<?> getAllFields(
             Principal principal,
-            @RequestParam(name = "page", required = false)
-            @Parameter(description = "The number of the page") Integer page,
+            /* вместо этих параметров можно просто использовать Pageable pageable  */
+            @RequestParam(name = "page", required = false) @Parameter(description = "The number of the page") Integer page,
             @RequestParam(name = "size", required = false) @Parameter(description = "The size of the page") Integer size
     ) {
         if (page != null && size != null) {
@@ -61,11 +61,11 @@ public class FieldController {
 
     @Operation(summary = "Delete field", description = "Delete the field with given position")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(
+    public ResponseEntity<FieldDto> delete(
             @PathVariable @Parameter(description = "Field position in questionnaire") Integer id,
             Principal principal) {
-        fieldService.delete(principal, id);
-        return ResponseEntity.ok("Field was successfully deleted");
+        FieldDto deletedField = fieldService.delete(principal, id);
+        return ResponseEntity.ok(deletedField);
     }
 
     @Operation(summary = "Update field", description = "Update the field with given position")
