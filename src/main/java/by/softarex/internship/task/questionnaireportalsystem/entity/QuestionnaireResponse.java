@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -20,17 +21,12 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "responses")
-public class QuestionnaireResponse {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+public class QuestionnaireResponse extends UuidEntity{
     private UUID answerId;
     private String value;
+    private Integer position;
+    @Column(name = "creation_date")
+    private Date date;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "questionnaire_id")
     private Questionnaire questionnaire;

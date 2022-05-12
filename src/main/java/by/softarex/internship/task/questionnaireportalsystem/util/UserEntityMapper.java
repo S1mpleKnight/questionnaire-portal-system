@@ -1,7 +1,7 @@
 package by.softarex.internship.task.questionnaireportalsystem.util;
 
 import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
-import by.softarex.internship.task.questionnaireportalsystem.dto.UserUpdateDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.UserDataDto;
 import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 public class UserEntityMapper {
     private PasswordEncoder passwordEncoder;
 
-    public UserUpdateDto toUserDto(User user) {
-        UserUpdateDto userUpdateDto = new UserUpdateDto();
-        userUpdateDto.setEmail(user.getEmail());
-        userUpdateDto.setFirstname(user.getFirstname());
-        userUpdateDto.setLastname(user.getLastname());
-        userUpdateDto.setPhone(user.getPhone());
-        return userUpdateDto;
+    public UserDataDto toUserDto(User user) {
+        UserDataDto userDataDto = new UserDataDto();
+        userDataDto.setEmail(user.getEmail());
+        userDataDto.setFirstname(user.getFirstname());
+        userDataDto.setLastname(user.getLastname());
+        userDataDto.setPhone(user.getPhone());
+        return userDataDto;
     }
 
     public User toUserEntity(UserDto userDto) {

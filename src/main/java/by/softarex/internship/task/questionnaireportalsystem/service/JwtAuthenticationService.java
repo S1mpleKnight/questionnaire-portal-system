@@ -18,9 +18,9 @@ public class JwtAuthenticationService {
     private final JwtTokenProvider tokenProvider;
     private final UserService userService;
 
-    public Map<Object, Object> authenticate(AuthenticationRequestDto request) {
+    public Object authenticate(AuthenticationRequestDto request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        return fillMap(request, createToken(request));
+        return fillMap(createToken(request));
     }
 
     private String createToken(AuthenticationRequestDto request) {
@@ -28,9 +28,8 @@ public class JwtAuthenticationService {
         return tokenProvider.createToken(request.getEmail(), id.toString());
     }
 
-    private Map<Object, Object> fillMap(AuthenticationRequestDto request, String token) {
+    private Object fillMap(String token) {
         Map<Object, Object> response = new HashMap<>();
-        response.put("id", request.getEmail());
         response.put("token", token);
         return response;
     }

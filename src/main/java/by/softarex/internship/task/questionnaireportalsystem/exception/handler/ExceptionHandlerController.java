@@ -5,6 +5,8 @@ import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotE
 import by.softarex.internship.task.questionnaireportalsystem.exception.InvalidPasswordException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.JwtAuthenticationException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
+import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireResponseException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,20 +21,23 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Tag(name = "Exception handler")
 @RestControllerAdvice
 public class ExceptionHandlerController {
 
-    @ExceptionHandler({EmailExistException.class, InvalidPasswordException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({EmailExistException.class, InvalidPasswordException.class, QuestionnaireResponseException.class})
     public ResponseEntity<String> badRequest(RuntimeException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<String> badRequest(BindException e) {
         return ResponseEntity.badRequest().body(takeErrorFields(e));
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({FieldNotExistException.class, QuestionnaireNotExistException.class})
     public ResponseEntity<String> notFound(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

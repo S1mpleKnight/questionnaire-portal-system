@@ -21,15 +21,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "questionnaires")
-public class Questionnaire {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+public class Questionnaire extends UuidEntity{
     @OneToOne
     @ToString.Exclude
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -39,5 +31,5 @@ public class Questionnaire {
     private List<Field> fields;
     @OneToMany(mappedBy = "questionnaire")
     @ToString.Exclude
-    private List<QuestionnaireResponse> respons;
+    private List<QuestionnaireResponse> questionnaireResponses;
 }

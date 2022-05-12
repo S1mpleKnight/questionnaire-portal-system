@@ -1,6 +1,6 @@
 package by.softarex.internship.task.questionnaireportalsystem.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.mail.SimpleMailMessage;
@@ -9,16 +9,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Scope("singleton")
+@RequiredArgsConstructor
 public class MailService {
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
+    @Value("${mail.username}")
     private String username;
-
-    @Autowired
-    public void setMailSender(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
 
     public void send(String emailTo, String subject, String message) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();

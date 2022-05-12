@@ -1,5 +1,6 @@
 package by.softarex.internship.task.questionnaireportalsystem.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,6 +11,7 @@ import javax.validation.constraints.Pattern;
 @ToString
 @Getter
 @Setter
+@Schema(description = "Field entity")
 public class FieldDto {
     @NotBlank(message = "Enter a valid label")
     private String label;

@@ -11,6 +11,6 @@ Java Spring Softarex test project
 |  Edit Profile | /profile|
 |  Change Password | /password|
 |  Fields list page | /fields|
-|  Questionnaire page | /{:userId} |
+|  Questionnaire page | /responses/{:userId} |
 |  Success submit of answer | /congratulation|
-|  Responses list page | /respons|
+|  Responses list page | /responses|
