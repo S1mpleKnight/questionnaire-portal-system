@@ -20,7 +20,6 @@ import java.util.Set;
 @Entity
 @Table(name = "fields")
 public class Field extends UuidEntity{
-    @Column(name = "is_active")
     private boolean isActive;
     private boolean required;
     private String label;

@@ -7,12 +7,11 @@ databaseChangeLog:
             tableName: field_options
             columns:
               - column:
-                  autoIncrement: true
-                  name: id
-                  type: bigint
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                    name: id
+                    type: uuid
+                    constraints:
+                      primaryKey: true
+                      nullable: false
               - column:
                   name: value
                   type: varchar(50)
