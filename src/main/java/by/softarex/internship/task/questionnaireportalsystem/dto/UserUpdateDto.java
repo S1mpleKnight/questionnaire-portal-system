@@ -15,15 +15,15 @@ import javax.validation.constraints.Pattern;
 @Schema(description = "Entity to update user data")
 public class UserUpdateDto {
     @NotBlank(message = "Enter a valid firstname")
-    @Pattern(regexp = "[A-Z][a-z]{3,34}", message = "Enter a valid firstname")
+    @Pattern(regexp = "[a-zA-Z]{2,35}", message = "Enter a valid firstname")
     private String firstname;
     @NotBlank(message = "Enter a valid lastname")
-    @Pattern(regexp = "[A-Z][a-z]{2,34}", message = "Enter a valid lastname")
+    @Pattern(regexp = "[a-zA-Z]{2,35}", message = "Enter a valid lastname")
     private String lastname;
     @Email(message = "Enter a valid email address")
     @NotBlank(message = "Enter a valid email address")
     private String email;
     @NotBlank
-    @Pattern(regexp = "[\\d]{12,15}", message = "Enter a valid phone number")
+    @Pattern(regexp = "[+]?[\\d]{11,14}", message = "Enter a valid phone number")
     private String phone;
 }

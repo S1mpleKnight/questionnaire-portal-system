@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -24,6 +25,7 @@ public class AuthController {
     private final UserService userService;
     private final JwtAuthenticationService jwtService;
 
+    @CrossOrigin
     @Operation(summary = "Registration", description = "Register user via entered data")
     @PostMapping("/api/register")
     public ResponseEntity<UserUpdateDto> register(
@@ -31,6 +33,7 @@ public class AuthController {
         return ResponseEntity.ok(userService.save(userDto));
     }
 
+    @CrossOrigin
     @Operation(summary = "Log in", description = "Log in user via email and password")
     @PostMapping("/api/login")
     public ResponseEntity<Map<Object, Object>> login(
