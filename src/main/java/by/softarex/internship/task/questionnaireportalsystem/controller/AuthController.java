@@ -20,12 +20,12 @@ import java.util.Map;
 
 @Tag(name = "Authentication Controller", description = "Processes registration and authorization requests")
 @Controller
+@CrossOrigin(origins = "http://localhost:3000")
 @AllArgsConstructor
 public class AuthController {
     private final UserService userService;
     private final JwtAuthenticationService jwtService;
 
-    @CrossOrigin
     @Operation(summary = "Registration", description = "Register user via entered data")
     @PostMapping("/api/register")
     public ResponseEntity<UserUpdateDto> register(
@@ -33,7 +33,6 @@ public class AuthController {
         return ResponseEntity.ok(userService.save(userDto));
     }
 
-    @CrossOrigin
     @Operation(summary = "Log in", description = "Log in user via email and password")
     @PostMapping("/api/login")
     public ResponseEntity<Map<Object, Object>> login(
