@@ -211,7 +211,7 @@ public class QuestionnaireResponseService {
     private Optional<Questionnaire> isQuestionnaireExist(UUID userId) {
         Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Id(userId);
         if (questionnaire.isEmpty()) {
-            throw new QuestionnaireNotExistException();
+            throw new QuestionnaireNotExistException("Questionnaire does not exist, id: " + userId.toString());
         }
         return questionnaire;
     }
