@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 @Setter
 @ToString
 @Schema(description = "User entity")
-public class UserDto extends UserUpdateDto {
+public class UserDto extends UserDataDto {
     @NotBlank(message = "Enter a valid password")
     @Size(max = 255, min = 10, message = "Enter a valid password")
     private String password;

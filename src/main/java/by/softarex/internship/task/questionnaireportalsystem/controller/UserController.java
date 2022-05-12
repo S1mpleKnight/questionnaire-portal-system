@@ -1,7 +1,7 @@
 package by.softarex.internship.task.questionnaireportalsystem.controller;
 
 import by.softarex.internship.task.questionnaireportalsystem.dto.ChangePasswordDto;
-import by.softarex.internship.task.questionnaireportalsystem.dto.UserUpdateDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.UserDataDto;
 import by.softarex.internship.task.questionnaireportalsystem.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,15 +26,15 @@ public class UserController {
 
     @Operation(summary = "User data", description = "Get user profile info")
     @GetMapping("/api/profile")
-    public ResponseEntity<UserUpdateDto> getData(Principal principal) {
-        UserUpdateDto userUpdateDto = userService.findByPrincipal(principal);
-        return ResponseEntity.ok(userUpdateDto);
+    public ResponseEntity<UserDataDto> getData(Principal principal) {
+        UserDataDto userDataDto = userService.findByPrincipal(principal);
+        return ResponseEntity.ok(userDataDto);
     }
 
     @Operation(summary = "Update user", description = "Update user profile info")
     @PutMapping("/api/profile")
-    public ResponseEntity<UserUpdateDto> updateUser(
-            @Valid @RequestBody @Parameter(description = "New user data") UserUpdateDto updateDto,
+    public ResponseEntity<UserDataDto> updateUser(
+            @Valid @RequestBody @Parameter(description = "New user data") UserDataDto updateDto,
             Principal principal) {
         return ResponseEntity.ok(userService.update(principal, updateDto));
     }

@@ -13,7 +13,7 @@ import javax.validation.constraints.Pattern;
 @Setter
 @ToString
 @Schema(description = "Entity to update user data")
-public class UserUpdateDto {
+public class UserDataDto {
     @NotBlank(message = "Enter a valid firstname")
     @Pattern(regexp = "[a-zA-Z]{2,35}", message = "Enter a valid firstname")
     private String firstname;
