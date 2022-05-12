@@ -4,11 +4,12 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, UUID> {
-    Boolean existsByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-    User findByEmail(String email);
+    Boolean existsByEmail(String email);
 }
