@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
@@ -23,11 +24,12 @@ import java.util.UUID;
 @Tag(name = "Questionnaire response controller", description = "Process questionnaire response creation")
 @RequiredArgsConstructor
 @Controller
+@RequestMapping("/api/responses")
 public class QuestionnaireResponseController {
     private final QuestionnaireResponseService questionnaireResponseService;
 
     @Operation(summary = "Create responses", description = "Save all questionnaire responses to the database")
-    @PostMapping("/api/responses/{userId}")
+    @PostMapping("/{userId}")
     public ResponseEntity<List<QuestionnaireResponseDto>> create(
             @Valid @RequestBody @Parameter(description = "New responses data") List<QuestionnaireResponseDto> responses,
             @PathVariable(name = "userId") @Parameter(description = "Questionnaire creator's id") UUID userId
@@ -36,7 +38,7 @@ public class QuestionnaireResponseController {
     }
 
     @Operation(summary = "Get responses", description = "Get all responses to the questionnaire")
-    @GetMapping("/api/responses")
+    @GetMapping
     public ResponseEntity<?> findAll(
             Principal principal,
             @RequestParam(name = "page", required = false)

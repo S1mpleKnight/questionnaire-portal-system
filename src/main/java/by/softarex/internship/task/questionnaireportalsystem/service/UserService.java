@@ -30,10 +30,10 @@ public class UserService implements UserDetailsService {
     private final static String PASSWORD_MAIL_SUBJECT = "Security notification";
     private final static String REGISTRATION_MAIL_MESSAGE = "You have been registered in the questionnaire portal system";
     private final static String REGISTRATION_MAIL_SUBJECT = "Portal registration";
-    private UserRepository userRepository;
-    private UserEntityMapper mapper;
-    private PasswordEncoder passwordEncoder;
-    private MailService mailService;
+    private final UserRepository userRepository;
+    private final UserEntityMapper mapper;
+    private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
 
     public UserDataDto findByPrincipal(Principal principal) {
         return mapper.toUserDto(userRepository.findByEmail(principal.getName()).get());
