@@ -1,7 +1,7 @@
 package by.softarex.internship.task.questionnaireportalsystem.security;
 
 import by.softarex.internship.task.questionnaireportalsystem.exception.JwtAuthenticationException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +16,7 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenProvider tokenProvider;
 

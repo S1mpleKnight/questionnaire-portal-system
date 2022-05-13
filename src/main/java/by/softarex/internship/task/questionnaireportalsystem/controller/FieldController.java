@@ -5,7 +5,7 @@ import by.softarex.internship.task.questionnaireportalsystem.service.FieldServic
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,7 +23,7 @@ import java.security.Principal;
 
 @Tag(name = "Field controller", description = "Process CRUD field requests")
 @Controller
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/fields")
 public class FieldController {
     private final FieldService fieldService;

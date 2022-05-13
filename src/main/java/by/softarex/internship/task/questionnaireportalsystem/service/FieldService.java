@@ -15,7 +15,7 @@ import by.softarex.internship.task.questionnaireportalsystem.repository.Question
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireResponseRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
 import by.softarex.internship.task.questionnaireportalsystem.util.FieldMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Scope("singleton")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FieldService {
     private final FieldRepository fieldRepository;
     private final QuestionnaireRepository questionnaireRepository;

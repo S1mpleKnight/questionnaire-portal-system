@@ -8,7 +8,7 @@ import by.softarex.internship.task.questionnaireportalsystem.service.UserService
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @Tag(name = "Authentication Controller", description = "Processes registration and authorization requests")
 @Controller
 @RequestMapping("/api/")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
     private final JwtAuthenticationService jwtService;

@@ -14,7 +14,7 @@ import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRep
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireResponseRepository;
 import by.softarex.internship.task.questionnaireportalsystem.util.QuestionnaireResponseEntityMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Scope("singleton")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class QuestionnaireResponseService {
     private static final String NO_DATA_STRING = "N/A";
     private final static String RESPONSE_OPTIONS_DELIMITER = ", ";
