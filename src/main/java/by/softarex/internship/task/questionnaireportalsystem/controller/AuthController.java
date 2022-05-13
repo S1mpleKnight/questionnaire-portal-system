@@ -1,6 +1,7 @@
 package by.softarex.internship.task.questionnaireportalsystem.controller;
 
 import by.softarex.internship.task.questionnaireportalsystem.dto.AuthenticationRequestDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.AuthenticationTokenDto;
 import by.softarex.internship.task.questionnaireportalsystem.dto.UserDataDto;
 import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
 import by.softarex.internship.task.questionnaireportalsystem.service.JwtAuthenticationService;
@@ -34,9 +35,9 @@ public class AuthController {
 
     @Operation(summary = "Log in", description = "Log in user via email and password")
     @PostMapping("/login")
-    public ResponseEntity<Object> login(
+    public ResponseEntity<AuthenticationTokenDto> login(
             @Valid @RequestBody @Parameter(required = true, description = "Email & password") AuthenticationRequestDto authDto) {
-       Object result = jwtService.authenticate(authDto);
+       AuthenticationTokenDto result = jwtService.authenticate(authDto);
         return ResponseEntity.ok(result);
     }
 }
