@@ -2,17 +2,10 @@ package by.softarex.internship.task.questionnaireportalsystem.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.util.UUID;
 
 @Setter
 @Getter
@@ -22,11 +15,8 @@ public class User extends UuidEntity{
     private String firstname;
     private String lastname;
     private String email;
-    @Column(name = "phone_number")
     private String phone;
-    @Column(name = "password_hash")
     private String passwordHash;
     @OneToOne(mappedBy = "user")
-    @ToString.Exclude
     private Questionnaire questionnaire;
 }

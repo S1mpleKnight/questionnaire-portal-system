@@ -33,10 +33,4 @@ public class QuestionnaireResponse extends UuidEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "field_id")
     private Field field;
-
-    public QuestionnaireResponse(UUID answerId, String value, Field field) {
-        this.answerId = answerId;
-        this.value = value;
-        this.field = field;
-    }
 }

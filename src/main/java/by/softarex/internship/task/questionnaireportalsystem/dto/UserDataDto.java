@@ -3,7 +3,6 @@ package by.softarex.internship.task.questionnaireportalsystem.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -11,7 +10,6 @@ import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
-@ToString
 @Schema(description = "Entity to update user data")
 public class UserDataDto {
     @NotBlank(message = "Enter a valid firstname")

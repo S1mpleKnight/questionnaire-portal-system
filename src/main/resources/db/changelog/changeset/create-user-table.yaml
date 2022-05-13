@@ -25,5 +25,5 @@ databaseChangeLog:
                   name: password_hash
                   type: varchar(255)
               - column:
-                  name: phone_number
+                  name: phone
                   type: varchar(20)
