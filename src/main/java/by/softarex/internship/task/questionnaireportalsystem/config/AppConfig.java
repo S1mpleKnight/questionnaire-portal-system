@@ -20,7 +20,12 @@ public class AppConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOrigins(allowedSource);
+        registry
+                .addMapping("/api/**")
+                .allowedOrigins(allowedSource)
+                .allowedHeaders("*")
+                .allowedMethods("*")
+                .maxAge(3600);
     }
 
     @Bean

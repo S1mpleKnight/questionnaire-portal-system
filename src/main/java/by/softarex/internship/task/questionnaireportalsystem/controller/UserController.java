@@ -19,7 +19,6 @@ import java.security.Principal;
 
 @Tag(name = "User controller", description = "Process update password & profile requests")
 @Controller
-@CrossOrigin(origins = "http://localhost:3000")
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
