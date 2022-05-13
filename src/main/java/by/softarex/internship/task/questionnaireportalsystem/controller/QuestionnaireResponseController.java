@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -40,17 +39,10 @@ public class QuestionnaireResponseController {
     @Operation(summary = "Get responses", description = "Get all responses to the questionnaire")
     @GetMapping
     public ResponseEntity<?> findAll(
-            Principal principal,
-            @RequestParam(name = "page", required = false)
-            @Parameter(description = "The number of the page") Integer page,
-            @RequestParam(name = "size", required = false)
-            @Parameter(description = "The size of the page") Integer size
+            @Parameter(description = "The number & the size of the page") Pageable pageable,
+            Principal principal
     ) {
-        if (page != null && size != null) {
-            return ResponseEntity.ok(questionnaireResponseService.findAllByUserId(principal, PageRequest.of(page, size)));
-        } else {
-            return ResponseEntity.ok(questionnaireResponseService.findAllByUserId(principal));
-        }
+        return ResponseEntity.ok(questionnaireResponseService.findAllByUserId(principal, pageable));
     }
 }
 

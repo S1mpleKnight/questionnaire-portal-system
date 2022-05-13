@@ -3,6 +3,8 @@ package by.softarex.internship.task.questionnaireportalsystem.repository;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
 import by.softarex.internship.task.questionnaireportalsystem.entity.QuestionnaireResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,5 +24,5 @@ public interface QuestionnaireResponseRepository extends JpaRepository<Questionn
     )
     List<QuestionnaireResponse> findAllSorted(UUID questionnaireId);
 
-    List<QuestionnaireResponse> findAllByQuestionnaireOrderByAnswerId(Questionnaire questionnaire);
+    Page<QuestionnaireResponse> findAllByQuestionnaireOrderByAnswerId(Questionnaire questionnaire, Pageable pageable);
 }

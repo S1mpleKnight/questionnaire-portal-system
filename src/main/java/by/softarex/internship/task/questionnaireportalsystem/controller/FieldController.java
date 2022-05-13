@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -31,15 +30,10 @@ public class FieldController {
     @Operation(summary = "All fields", description = "Get all fields to the current questionnaire")
     @GetMapping
     public ResponseEntity<?> getAllFields(
-            Principal principal,
-            @RequestParam(name = "page", required = false) @Parameter(description = "The number of the page") Integer page,
-            @RequestParam(name = "size", required = false) @Parameter(description = "The size of the page") Integer size
+            @Parameter(description = "The number & the size of the page") Pageable pageable,
+            Principal principal
     ) {
-        if (page != null && size != null) {
-            return ResponseEntity.ok(fieldService.findAllByUserEmail(principal, PageRequest.of(page, size)));
-        } else {
-            return ResponseEntity.ok(fieldService.findAllByUserEmail(principal));
-        }
+        return ResponseEntity.ok(fieldService.findAllByUserEmail(principal, pageable));
     }
 
     @Operation(summary = "Get field", description = "Get the field by the position")

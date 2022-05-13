@@ -17,7 +17,6 @@ import by.softarex.internship.task.questionnaireportalsystem.util.QuestionnaireR
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,19 +45,9 @@ public class QuestionnaireResponseService {
 
     public Page<QuestionnaireResponseDto> findAllByUserId(Principal principal, Pageable pageable) {
         Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
-        List<QuestionnaireResponseDto> questionnaireResponses = questionnaireResponseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get())
-                .stream()
-                .map(mapper::toResponseDto)
-                .collect(Collectors.toList());
-        return new PageImpl<>(questionnaireResponses, pageable, questionnaireResponses.size());
-    }
-
-    public List<QuestionnaireResponseDto> findAllByUserId(Principal principal) {
-        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
-        return questionnaireResponseRepository.findAllSorted(questionnaire.get().getId())
-                .stream()
-                .map(mapper::toResponseDto)
-                .collect(Collectors.toList());
+        Page<QuestionnaireResponse> questionnaireResponses
+                = questionnaireResponseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get(), pageable);
+        return questionnaireResponses.map(mapper::toResponseDto);
     }
 
     @Transactional

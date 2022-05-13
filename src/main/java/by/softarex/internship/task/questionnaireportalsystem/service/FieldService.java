@@ -42,19 +42,8 @@ public class FieldService {
     private final FieldMapper mapper;
 
     public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
-        List<Field> fields = getAllField(principal);
-        return new PageImpl<>(fields
-                .stream()
-                .map(mapper::toFieldDto)
-                .collect(Collectors.toList()), pageable, fields.size());
-    }
-
-    public List<FieldDto> findAllByUserEmail(Principal principal) {
-        List<Field> fields = getAllField(principal);
-        return fields
-                .stream()
-                .map(mapper::toFieldDto)
-                .collect(Collectors.toList());
+        Page<Field> fields = getAllField(principal, pageable);
+        return fields.map(mapper::toFieldDto);
     }
 
     public FieldDto getFieldDto(Principal principal, Integer fieldPosition) {
@@ -120,6 +109,13 @@ public class FieldService {
         return questionnaire.isPresent()
                 ? fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId())
                 : Collections.emptyList();
+    }
+
+    private Page<Field> getAllField(Principal principal, Pageable pageable) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
+        return questionnaire.isPresent()
+                ? fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId(), pageable)
+                : new PageImpl<>(Collections.emptyList());
     }
 
     private void deleteDependEntities(Field field) {
