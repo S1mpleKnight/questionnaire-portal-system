@@ -124,10 +124,10 @@ public class FieldService {
     }
 
     private void deleteFieldResponses(Field field) {
-        List<FieldResponse> responses = fieldResponseRepository.findAllByField(field);
-        if (!responses.isEmpty()) {
-            fieldResponseRepository.deleteAll(responses);
-        }
+//        List<FieldResponse> responses = fieldResponseRepository.findAllByField(field);
+//        if (!responses.isEmpty()) {
+//            fieldResponseRepository.deleteAll(responses);
+//        }
     }
 
     private Field getField(String currentUserEmail, Integer fieldPosition) {

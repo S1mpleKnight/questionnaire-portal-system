@@ -1,6 +1,7 @@
 package by.softarex.internship.task.questionnaireportalsystem.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "questionnaire_responses")
 public class QuestionnaireResponse extends UuidEntity{
     private Date creationDate;
