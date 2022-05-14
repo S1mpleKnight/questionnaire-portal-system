@@ -5,6 +5,7 @@ Java Spring Softarex test project
 
 |  Page name  |  URL |
 | :---------: | :---: |
+|  Global prefix | /api|
 |  Log in | /login|
 |  Log out | /logout|
 |  Sign up | /register|

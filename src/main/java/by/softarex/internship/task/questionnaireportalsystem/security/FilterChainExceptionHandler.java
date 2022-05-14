@@ -29,5 +29,4 @@ public class FilterChainExceptionHandler extends OncePerRequestFilter {
             resolver.resolveException(httpServletRequest, httpServletResponse, this, e);
         }
     }
-    //todo: catch cases when email was changed -> old token with old email
 }

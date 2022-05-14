@@ -1,10 +1,10 @@
 package by.softarex.internship.task.questionnaireportalsystem.security;
 
 import by.softarex.internship.task.questionnaireportalsystem.exception.JwtAuthenticationException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -15,10 +15,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-@Slf4j
-@RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenProvider tokenProvider;
+    private final AuthenticationFailureHandler failureHandler;
+
+    public JwtTokenFilter(
+            JwtTokenProvider tokenProvider,
+            @Qualifier(value = "restAuthFailureHandler") AuthenticationFailureHandler failureHandler) {
+        this.tokenProvider = tokenProvider;
+        this.failureHandler = failureHandler;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
@@ -27,14 +33,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             acceptAuthentication(token);
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } catch (JwtAuthenticationException e) {
-            rejectAuthentication(e);
+            SecurityContextHolder.clearContext();
+            failureHandler.onAuthenticationFailure(httpServletRequest, httpServletResponse,e);
         }
-    }
-
-    private void rejectAuthentication(JwtAuthenticationException e) {
-        log.error(e.getMessage());
-        SecurityContextHolder.clearContext();
-        throw new JwtAuthenticationException("JWT token filter have not been passed");
     }
 
     private void acceptAuthentication(String token) {

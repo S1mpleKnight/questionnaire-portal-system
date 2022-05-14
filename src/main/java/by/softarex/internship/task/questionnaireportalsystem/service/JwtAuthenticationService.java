@@ -5,7 +5,9 @@ import by.softarex.internship.task.questionnaireportalsystem.dto.AuthenticationT
 import by.softarex.internship.task.questionnaireportalsystem.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -18,7 +20,10 @@ public class JwtAuthenticationService {
     private final UserService userService;
 
     public AuthenticationTokenDto authenticate(AuthenticationRequestDto request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        if (authentication == null) {
+            throw new BadCredentialsException("Invalid credentials");
+        }
         return new AuthenticationTokenDto(createToken(request));
     }
 
