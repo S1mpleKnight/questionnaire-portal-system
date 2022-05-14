@@ -21,7 +21,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 
-@Slf4j
 @Component
 public class JwtTokenProvider {
     private final UserDetailsService userDetailsService;
@@ -49,7 +48,6 @@ public class JwtTokenProvider {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token.split(" ")[1]);
             return isTokenValid(claimsJws);
         } catch (JwtException | IllegalArgumentException e) {
-            log.error(e.getMessage());
             throw new JwtAuthenticationException("JWT token is not valid");
         }
     }

@@ -1,14 +1,14 @@
 package by.softarex.internship.task.questionnaireportalsystem.service;
 
 import by.softarex.internship.task.questionnaireportalsystem.dto.ChangePasswordDto;
-import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
 import by.softarex.internship.task.questionnaireportalsystem.dto.UserDataDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
 import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.EmailExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.InvalidPasswordException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
 import by.softarex.internship.task.questionnaireportalsystem.util.UserEntityMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,16 +24,16 @@ import java.util.UUID;
 
 @Service
 @Scope("singleton")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
     private final static String PASSWORD_MAIL_MESSAGE = "Password has been changed";
     private final static String PASSWORD_MAIL_SUBJECT = "Security notification";
     private final static String REGISTRATION_MAIL_MESSAGE = "You have been registered in the questionnaire portal system";
     private final static String REGISTRATION_MAIL_SUBJECT = "Portal registration";
-    private UserRepository userRepository;
-    private UserEntityMapper mapper;
-    private PasswordEncoder passwordEncoder;
-    private MailService mailService;
+    private final UserRepository userRepository;
+    private final UserEntityMapper mapper;
+    private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
 
     public UserDataDto findByPrincipal(Principal principal) {
         return mapper.toUserDto(userRepository.findByEmail(principal.getName()).get());

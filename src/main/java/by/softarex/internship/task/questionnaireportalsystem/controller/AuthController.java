@@ -1,17 +1,17 @@
 package by.softarex.internship.task.questionnaireportalsystem.controller;
 
 import by.softarex.internship.task.questionnaireportalsystem.dto.AuthenticationRequestDto;
-import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.AuthenticationTokenDto;
 import by.softarex.internship.task.questionnaireportalsystem.dto.UserDataDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
 import by.softarex.internship.task.questionnaireportalsystem.service.JwtAuthenticationService;
 import by.softarex.internship.task.questionnaireportalsystem.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,9 +20,8 @@ import javax.validation.Valid;
 
 @Tag(name = "Authentication Controller", description = "Processes registration and authorization requests")
 @Controller
-@CrossOrigin(origins = "http://localhost:3000") /* TODO: убрать, и перенести в SecurityConfig */
-@RequestMapping("/api/")
-@AllArgsConstructor
+@RequestMapping("/api")
+@RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
     private final JwtAuthenticationService jwtService;
@@ -36,9 +35,9 @@ public class AuthController {
 
     @Operation(summary = "Log in", description = "Log in user via email and password")
     @PostMapping("/login")
-    public ResponseEntity<Object> login(
+    public ResponseEntity<AuthenticationTokenDto> login(
             @Valid @RequestBody @Parameter(required = true, description = "Email & password") AuthenticationRequestDto authDto) {
-       Object result = jwtService.authenticate(authDto);
+       AuthenticationTokenDto result = jwtService.authenticate(authDto);
         return ResponseEntity.ok(result);
     }
 }

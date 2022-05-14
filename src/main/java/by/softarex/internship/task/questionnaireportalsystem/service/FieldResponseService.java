@@ -1,25 +1,25 @@
 package by.softarex.internship.task.questionnaireportalsystem.service;
 
-import by.softarex.internship.task.questionnaireportalsystem.dto.QuestionnaireResponseDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.FieldResponseDto;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
-import by.softarex.internship.task.questionnaireportalsystem.entity.QuestionnaireResponse;
+import by.softarex.internship.task.questionnaireportalsystem.entity.FieldResponse;
 import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireResponseException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldOptionRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
-import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireResponseRepository;
-import by.softarex.internship.task.questionnaireportalsystem.util.QuestionnaireResponseEntityMapper;
-import lombok.AllArgsConstructor;
+import by.softarex.internship.task.questionnaireportalsystem.repository.FieldResponseRepository;
+import by.softarex.internship.task.questionnaireportalsystem.util.FieldResponseEntityMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -33,69 +33,60 @@ import java.util.stream.Collectors;
 
 @Service
 @Scope("singleton")
-@AllArgsConstructor
-public class QuestionnaireResponseService {
+@RequiredArgsConstructor
+public class FieldResponseService {
     private static final String NO_DATA_STRING = "N/A";
     private final static String RESPONSE_OPTIONS_DELIMITER = ", ";
-    private final QuestionnaireResponseRepository questionnaireResponseRepository;
+    private final FieldResponseRepository fieldResponseRepository;
     private final QuestionnaireRepository questionnaireRepository;
     private final FieldRepository fieldRepository;
     private final FieldOptionRepository fieldOptionsRepository;
-    private final QuestionnaireResponseEntityMapper mapper;
+    private final FieldResponseEntityMapper mapper;
 
-    public Page<QuestionnaireResponseDto> findAllByUserId(Principal principal, Pageable pageable) {
+    public Page<FieldResponseDto> findAllByUserId(Principal principal, Pageable pageable) {
         Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
-        List<QuestionnaireResponseDto> questionnaireResponses = questionnaireResponseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get())
-                .stream()
-                .map(mapper::toResponseDto)
-                .collect(Collectors.toList());
-        return new PageImpl<>(questionnaireResponses, pageable, questionnaireResponses.size());
+        Page<FieldResponse> questionnaireResponses
+                = fieldResponseRepository.findAllByQuestionnaireOrderByAnswerId(questionnaire.get(), pageable);
+        return questionnaireResponses.map(mapper::toResponseDto);
     }
 
-    public List<QuestionnaireResponseDto> findAllByUserId(Principal principal) {
-        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
-        return questionnaireResponseRepository.findAllSorted(questionnaire.get().getId())
-                .stream()
-                .map(mapper::toResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    public List<QuestionnaireResponseDto> saveAll(List<QuestionnaireResponseDto> responses, UUID userId) {
+    @Transactional
+    public List<FieldResponseDto> saveAll(List<FieldResponseDto> responses, UUID userId) {
         Optional<Questionnaire> questionnaire = isQuestionnaireExist(userId);
         List<Field> questionnaireFields = fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId());
         UUID answerId = prepareSaving(responses, getRequiredFields(questionnaireFields));
-        List<QuestionnaireResponse> preparedQuestionnaireResponses = getQuestionnaireResponses(responses, questionnaire, questionnaireFields, answerId);
-        questionnaireResponseRepository.saveAll(preparedQuestionnaireResponses);
-        return preparedQuestionnaireResponses.stream().map(mapper::toResponseDto).collect(Collectors.toList());
+        List<FieldResponse> preparedFieldRespons = getQuestionnaireResponses(responses, questionnaire, questionnaireFields, answerId);
+        fieldResponseRepository.saveAll(preparedFieldRespons);
+        return preparedFieldRespons.stream().map(mapper::toResponseDto).collect(Collectors.toList());
     }
 
-    private List<QuestionnaireResponse> getQuestionnaireResponses(
-            List<QuestionnaireResponseDto> responses,
+    private List<FieldResponse> getQuestionnaireResponses(
+            List<FieldResponseDto> responses,
             Optional<Questionnaire> questionnaire,
             List<Field> questionnaireFields,
             UUID answerId
     ) {
-        List<QuestionnaireResponse> preparedQuestionnaireResponses = new ArrayList<>();
+        List<FieldResponse> preparedFieldRespons = new ArrayList<>();
         Date date = new Date();
-        for (QuestionnaireResponseDto responseDto : responses) {
-            QuestionnaireResponse response = prepareQuestionnaireResponse(date, questionnaire, questionnaireFields, answerId, responseDto);
-            preparedQuestionnaireResponses.add(response);
+        for (FieldResponseDto responseDto : responses) {
+            FieldResponse response = prepareQuestionnaireResponse(date, questionnaire, questionnaireFields, answerId, responseDto);
+            preparedFieldRespons.add(response);
         }
-        return preparedQuestionnaireResponses;
+        return preparedFieldRespons;
     }
 
-    private UUID prepareSaving(List<QuestionnaireResponseDto> responses, List<Field> requiredFields) {
+    private UUID prepareSaving(List<FieldResponseDto> responses, List<Field> requiredFields) {
         checkCopiedAnswers(responses);
         checkRequiredAnswers(responses, getRequiredFieldsPositions(requiredFields));
         return createAnswerId();
     }
 
-    private QuestionnaireResponse prepareQuestionnaireResponse(
+    private FieldResponse prepareQuestionnaireResponse(
             Date date,
             Optional<Questionnaire> questionnaire,
             List<Field> questionnaireFields,
             UUID answerId,
-            QuestionnaireResponseDto responseDto
+            FieldResponseDto responseDto
     ) {
         Field field = getField(questionnaireFields, responseDto);
         return createQuestionnaireResponse(questionnaire, answerId, responseDto, field, date);
@@ -107,14 +98,14 @@ public class QuestionnaireResponseService {
                 : Collections.emptyList();
     }
 
-    private QuestionnaireResponse createQuestionnaireResponse(
+    private FieldResponse createQuestionnaireResponse(
             Optional<Questionnaire> questionnaire,
             UUID answerId,
-            QuestionnaireResponseDto responseDto,
+            FieldResponseDto responseDto,
             Field field,
             Date date
     ) {
-        QuestionnaireResponse response = mapper.toResponseEntity(responseDto);
+        FieldResponse response = mapper.toResponseEntity(responseDto);
         response.setAnswerId(answerId);
         response.setQuestionnaire(questionnaire.get());
         response.setField(field);
@@ -123,7 +114,7 @@ public class QuestionnaireResponseService {
         return response;
     }
 
-    private void setCorrespondValue(Field field, QuestionnaireResponse response) {
+    private void setCorrespondValue(Field field, FieldResponse response) {
         if (field.isActive()) {
             checkResponseValue(field, response);
         } else {
@@ -135,13 +126,13 @@ public class QuestionnaireResponseService {
         }
     }
 
-    private void checkResponseValue(Field field, QuestionnaireResponse response) {
+    private void checkResponseValue(Field field, FieldResponse response) {
         List<FieldOption> options = getFieldOptions(field);
         checkRadiobuttonResponseValues(field, response, options);
         checkComboboxResponseValues(field, response, options);
     }
 
-    private void checkRadiobuttonResponseValues(Field field, QuestionnaireResponse response, List<FieldOption> options) {
+    private void checkRadiobuttonResponseValues(Field field, FieldResponse response, List<FieldOption> options) {
         if (field.getFieldType() == FieldType.RADIO_BUTTON) {
             if (options.stream().filter(o -> o.getValue().equals(response.getValue())).findFirst().isEmpty()) {
                 throw new QuestionnaireResponseException("No such response value: " + response.getValue());
@@ -149,7 +140,7 @@ public class QuestionnaireResponseService {
         }
     }
 
-    private void checkComboboxResponseValues(Field field, QuestionnaireResponse response, List<FieldOption> options) {
+    private void checkComboboxResponseValues(Field field, FieldResponse response, List<FieldOption> options) {
         if (field.getFieldType() == FieldType.COMBOBOX) {
             List<String> fieldResponses = Arrays.stream(response.getValue().split(RESPONSE_OPTIONS_DELIMITER)).toList();
             if (!options.stream().map(FieldOption::getValue).collect(Collectors.toList()).containsAll(fieldResponses)) {
@@ -158,14 +149,14 @@ public class QuestionnaireResponseService {
         }
     }
 
-    private Field getField(List<Field> questionnaireFields, QuestionnaireResponseDto responseDto) {
+    private Field getField(List<Field> questionnaireFields, FieldResponseDto responseDto) {
         if (responseDto.getPosition() - 1 >= questionnaireFields.size()) {
             throw new FieldNotExistException(responseDto.getPosition());
         }
         return questionnaireFields.get(responseDto.getPosition() - 1);
     }
 
-    private void checkRequiredAnswers(List<QuestionnaireResponseDto> responses, List<Integer> requiredFieldsPositions) {
+    private void checkRequiredAnswers(List<FieldResponseDto> responses, List<Integer> requiredFieldsPositions) {
         if (!isAllRequiredResponses(responses, requiredFieldsPositions)) {
             throw new QuestionnaireResponseException("There are not all required responses in the answer");
         }
@@ -178,25 +169,25 @@ public class QuestionnaireResponseService {
                 .collect(Collectors.toList());
     }
 
-    private void checkCopiedAnswers(List<QuestionnaireResponseDto> responses) {
+    private void checkCopiedAnswers(List<FieldResponseDto> responses) {
         if (responses.size() != getResponsesDistinctCount(responses)) {
             throw new QuestionnaireResponseException("There are 2 or more responses for the 1 field");
         }
     }
 
-    private boolean isAllRequiredResponses(List<QuestionnaireResponseDto> responses, List<Integer> positions) {
+    private boolean isAllRequiredResponses(List<FieldResponseDto> responses, List<Integer> positions) {
         return responses
                 .stream()
-                .map(QuestionnaireResponseDto::getPosition)
+                .map(FieldResponseDto::getPosition)
                 .map(p -> p - 1)
                 .collect(Collectors.toList())
                 .containsAll(positions);
     }
 
-    private long getResponsesDistinctCount(List<QuestionnaireResponseDto> responses) {
+    private long getResponsesDistinctCount(List<FieldResponseDto> responses) {
         return responses
                 .stream()
-                .map(QuestionnaireResponseDto::getPosition)
+                .map(FieldResponseDto::getPosition)
                 .distinct()
                 .count();
     }
@@ -218,7 +209,7 @@ public class QuestionnaireResponseService {
 
     private UUID createAnswerId() {
         UUID answerId = UUID.randomUUID();
-        while (questionnaireResponseRepository.existsByAnswerId(answerId)) {
+        while (fieldResponseRepository.existsByAnswerId(answerId)) {
             answerId = UUID.randomUUID();
         }
         return answerId;

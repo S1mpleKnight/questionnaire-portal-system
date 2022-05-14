@@ -1,16 +1,16 @@
 package by.softarex.internship.task.questionnaireportalsystem.util;
 
-import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
 import by.softarex.internship.task.questionnaireportalsystem.dto.UserDataDto;
+import by.softarex.internship.task.questionnaireportalsystem.dto.UserDto;
 import by.softarex.internship.task.questionnaireportalsystem.entity.User;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserEntityMapper {
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public UserDataDto toUserDto(User user) {
         UserDataDto userDataDto = new UserDataDto();

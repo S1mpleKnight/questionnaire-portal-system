@@ -3,7 +3,6 @@ package by.softarex.internship.task.questionnaireportalsystem.exception.handler;
 import by.softarex.internship.task.questionnaireportalsystem.exception.EmailExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.InvalidPasswordException;
-import by.softarex.internship.task.questionnaireportalsystem.exception.JwtAuthenticationException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireResponseException;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,12 +40,6 @@ public class ExceptionHandlerController {
     @ExceptionHandler({FieldNotExistException.class, QuestionnaireNotExistException.class})
     public ResponseEntity<String> notFound(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-    }
-
-    @ExceptionHandler({JwtAuthenticationException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public String unauthorized(AuthenticationException exception) {
-        return exception.getMessage();
     }
 
     @ExceptionHandler({BadCredentialsException.class})

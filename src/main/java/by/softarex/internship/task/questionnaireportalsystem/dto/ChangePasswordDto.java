@@ -3,14 +3,12 @@ package by.softarex.internship.task.questionnaireportalsystem.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Setter
 @Getter
-@ToString
 @Schema(description = "Dto that hold old & new passwords")
 public class ChangePasswordDto {
     @Size(max = 255, min = 10, message = "Enter a valid password")

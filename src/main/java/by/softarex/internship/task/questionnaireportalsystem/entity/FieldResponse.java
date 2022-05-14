@@ -21,7 +21,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "responses")
-public class QuestionnaireResponse extends UuidEntity{
+public class FieldResponse extends UuidEntity{
     private UUID answerId;
     private String value;
     private Integer position;
@@ -33,10 +33,4 @@ public class QuestionnaireResponse extends UuidEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "field_id")
     private Field field;
-
-    public QuestionnaireResponse(UUID answerId, String value, Field field) {
-        this.answerId = answerId;
-        this.value = value;
-        this.field = field;
-    }
 }

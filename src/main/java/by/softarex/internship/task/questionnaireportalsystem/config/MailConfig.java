@@ -20,9 +20,6 @@ public class MailConfig {
     private String protocol;
     private Boolean debug;
 
-    /* почему не вынести в @ConfigurationProperties эти проперти */
-    //про такую штуку не знал
-
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();

@@ -5,17 +5,17 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
-import by.softarex.internship.task.questionnaireportalsystem.entity.QuestionnaireResponse;
+import by.softarex.internship.task.questionnaireportalsystem.entity.FieldResponse;
 import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldOptionRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
-import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireResponseRepository;
+import by.softarex.internship.task.questionnaireportalsystem.repository.FieldResponseRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
 import by.softarex.internship.task.questionnaireportalsystem.util.FieldMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,29 +32,18 @@ import java.util.stream.Collectors;
 
 @Service
 @Scope("singleton")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FieldService {
     private final FieldRepository fieldRepository;
     private final QuestionnaireRepository questionnaireRepository;
     private final UserRepository userRepository;
     private final FieldOptionRepository fieldOptionRepository;
-    private final QuestionnaireResponseRepository questionnaireResponseRepository;
+    private final FieldResponseRepository fieldResponseRepository;
     private final FieldMapper mapper;
 
     public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
-        List<Field> fields = getAllField(principal);
-        return new PageImpl<>(fields
-                .stream()
-                .map(mapper::toFieldDto)
-                .collect(Collectors.toList()), pageable, fields.size());
-    }
-
-    public List<FieldDto> findAllByUserEmail(Principal principal) {
-        List<Field> fields = getAllField(principal);
-        return fields
-                .stream()
-                .map(mapper::toFieldDto)
-                .collect(Collectors.toList());
+        Page<Field> fields = getAllField(principal, pageable);
+        return fields.map(mapper::toFieldDto);
     }
 
     public FieldDto getFieldDto(Principal principal, Integer fieldPosition) {
@@ -122,15 +111,22 @@ public class FieldService {
                 : Collections.emptyList();
     }
 
+    private Page<Field> getAllField(Principal principal, Pageable pageable) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
+        return questionnaire.isPresent()
+                ? fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId(), pageable)
+                : new PageImpl<>(Collections.emptyList());
+    }
+
     private void deleteDependEntities(Field field) {
         deleteFieldOptions(field);
         deleteFieldResponses(field);
     }
 
     private void deleteFieldResponses(Field field) {
-        List<QuestionnaireResponse> responses = questionnaireResponseRepository.findAllByField(field);
+        List<FieldResponse> responses = fieldResponseRepository.findAllByField(field);
         if (!responses.isEmpty()) {
-            questionnaireResponseRepository.deleteAll(responses);
+            fieldResponseRepository.deleteAll(responses);
         }
     }
 
