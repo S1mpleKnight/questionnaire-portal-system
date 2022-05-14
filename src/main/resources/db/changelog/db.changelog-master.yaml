@@ -8,6 +8,8 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/create-field-option-table.yaml
   - include:
-      file: db/changelog/changeset/create-responses-table.yaml
+      file: db/changelog/changeset/create-questionnaire-response-table.yaml
+  - include:
+      file: db/changelog/changeset/create-field-responses-table.yaml
   - include:
       file: db/changelog/changeset/create-foreign-keys.yaml

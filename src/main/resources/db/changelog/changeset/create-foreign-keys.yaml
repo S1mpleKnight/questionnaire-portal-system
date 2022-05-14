@@ -18,7 +18,7 @@ databaseChangeLog:
             referencedColumnNames: id
             constraintName: questionnaire_user_FK
         - addColumn:
-            tableName: fields
+            tableName: questionnaire_responses
             columns:
               - column:
                   name: questionnaire_id
@@ -26,11 +26,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:
-            baseTableName: fields
+            baseTableName: questionnaire_responses
             baseColumnNames: questionnaire_id
             referencedTableName: questionnaires
             referencedColumnNames: id
-            constraintName: field_questionnaire_FK
+            constraintName: questionnaire_response_questionnaire_FK
         - addColumn:
             tableName: field_options
             columns:
@@ -44,32 +44,21 @@ databaseChangeLog:
             baseColumnNames: field_id
             referencedTableName: fields
             referencedColumnNames: id
-            constraintName: field_oprtions_fields_FK
+            constraintName: field_options_fields_FK
         - addColumn:
-            tableName: responses
+            tableName: field_responses
             columns:
               - column:
-                  name: field_id
-                  type: uuid
-                  constraints:
-                    nullable: false
-              - column:
-                  name: questionnaire_id
+                  name: questionnaire_response_id
                   type: uuid
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:
-            baseTableName: responses
-            baseColumnNames: field_id
-            referencedTableName: fields
+            baseTableName: field_responses
+            baseColumnNames: questionnaire_response_id
+            referencedTableName: questionnaire_responses
             referencedColumnNames: id
-            constraintName: responses_fields_FK
-        - addForeignKeyConstraint:
-            baseTableName: responses
-            baseColumnNames: questionnaire_id
-            referencedTableName: questionnaires
-            referencedColumnNames: id
-            constraintName: responses_questionnaire_FK
+            constraintName: field_responses_questionnaire_FK
         - addColumn:
             tableName: users
             columns:
@@ -82,3 +71,15 @@ databaseChangeLog:
                   referencedTableName: questionnaires
                   referencedColumnNames: id
                   constraintName: user_questionnaire_FK
+        - addColumn:
+            tableName: fields
+            columns:
+              - column:
+                  name: questionnaire_id
+                  type: uuid
+              - addForeignKeyConstraint:
+                  baseTableName: fields
+                  baseColumnNames: questionnaire_id
+                  referencedTableName: questionnaires
+                  referencedColumnNames: id
+                  constraintName: field_questionnaire_FK

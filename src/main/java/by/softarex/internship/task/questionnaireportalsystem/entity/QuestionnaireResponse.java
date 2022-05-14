@@ -9,22 +9,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "fields")
-public class Field extends UuidEntity{
-    private boolean isActive;
-    private boolean required;
-    private String label;
-    private Integer position;
-    private FieldType fieldType;
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "field")
-    private Set<FieldOption> options;
-    @ManyToOne
+@Table(name = "questionnaire_responses")
+public class QuestionnaireResponse extends UuidEntity{
+    private Date creationDate;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "questionnaire_id")
     private Questionnaire questionnaire;
+    @OneToMany(mappedBy = "response")
+    private List<FieldResponse> concreteResponses;
 }

@@ -20,17 +20,11 @@ import java.util.UUID;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "responses")
+@Table(name = "field_responses")
 public class FieldResponse extends UuidEntity{
-    private UUID answerId;
     private String value;
     private Integer position;
-    @Column(name = "creation_date")
-    private Date date;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "questionnaire_id")
-    private Questionnaire questionnaire;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "field_id")
-    private Field field;
+    @JoinColumn(name = "questionnaire_response_id")
+    private QuestionnaireResponse response;
 }
