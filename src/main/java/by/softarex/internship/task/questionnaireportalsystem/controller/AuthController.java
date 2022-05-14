@@ -20,7 +20,7 @@ import javax.validation.Valid;
 
 @Tag(name = "Authentication Controller", description = "Processes registration and authorization requests")
 @Controller
-@RequestMapping("/api/")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;

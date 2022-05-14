@@ -16,6 +16,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -25,7 +28,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/responses/*",
             "/api/register",
             "/api/login",
-            "/api/logout",
             "/v2/api-docs",
             "/swagger-resources",
             "/swagger-resources/**",
@@ -77,7 +79,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated()
             .and()
-                .apply(jwtConfigurer);
+                .apply(jwtConfigurer)
+            .and()
+                .logout(l -> l
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler((
+                                (request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK)))
+                );
     }
 }
 
