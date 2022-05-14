@@ -14,4 +14,5 @@ import java.util.UUID;
 
 @Repository
 public interface FieldResponseRepository extends JpaRepository<FieldResponse, UUID> {
+    List<FieldResponse> findAllByResponse_Questionnaire(Questionnaire questionnaire);
 }

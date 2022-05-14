@@ -6,6 +6,7 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldResponse;
+import by.softarex.internship.task.questionnaireportalsystem.entity.QuestionnaireResponse;
 import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
@@ -13,6 +14,7 @@ import by.softarex.internship.task.questionnaireportalsystem.repository.FieldOpt
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldResponseRepository;
+import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireResponseRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
 import by.softarex.internship.task.questionnaireportalsystem.util.FieldMapper;
 import lombok.RequiredArgsConstructor;
@@ -120,14 +122,18 @@ public class FieldService {
 
     private void deleteDependEntities(Field field) {
         deleteFieldOptions(field);
-        deleteFieldResponses(field);
+        deleteQuestionnaireResponses(field.getPosition(), field.getQuestionnaire());
     }
 
-    private void deleteFieldResponses(Field field) {
-//        List<FieldResponse> responses = fieldResponseRepository.findAllByField(field);
-//        if (!responses.isEmpty()) {
-//            fieldResponseRepository.deleteAll(responses);
-//        }
+    private void deleteQuestionnaireResponses(Integer position, Questionnaire questionnaire) {
+        List<FieldResponse> responses = fieldResponseRepository.findAllByResponse_Questionnaire(questionnaire);
+        responses = responses
+                .stream()
+                .filter(r -> r.getPosition().equals(position))
+                .collect(Collectors.toList());
+        if (!responses.isEmpty()) {
+            fieldResponseRepository.deleteAll(responses);
+        }
     }
 
     private Field getField(String currentUserEmail, Integer fieldPosition) {
