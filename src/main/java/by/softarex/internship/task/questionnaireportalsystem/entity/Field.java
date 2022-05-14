@@ -23,7 +23,7 @@ public class Field extends UuidEntity{
     private Integer position;
     private FieldType fieldType;
     @OneToMany(mappedBy = "field")
-    private List<QuestionnaireResponse> questionnaireResponses;
+    private List<FieldResponse> fieldRespons;
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "field")
     private Set<FieldOption> options;
     @ManyToOne

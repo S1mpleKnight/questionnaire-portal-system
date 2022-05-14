@@ -21,7 +21,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "responses")
-public class QuestionnaireResponse extends UuidEntity{
+public class FieldResponse extends UuidEntity{
     private UUID answerId;
     private String value;
     private Integer position;

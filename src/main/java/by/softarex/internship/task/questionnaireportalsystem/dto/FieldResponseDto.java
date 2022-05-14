@@ -11,7 +11,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Schema(description = "Questionnaire response entity")
-public class QuestionnaireResponseDto {
+public class FieldResponseDto {
     @NotBlank
     private String value;
     @Positive

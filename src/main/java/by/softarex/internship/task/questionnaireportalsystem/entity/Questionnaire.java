@@ -22,5 +22,5 @@ public class Questionnaire extends UuidEntity{
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "questionnaire")
     private List<Field> fields;
     @OneToMany(mappedBy = "questionnaire")
-    private List<QuestionnaireResponse> questionnaireResponses;
+    private List<FieldResponse> fieldRespons;
 }

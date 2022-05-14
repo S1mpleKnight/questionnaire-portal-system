@@ -5,14 +5,14 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.Field;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldOption;
 import by.softarex.internship.task.questionnaireportalsystem.entity.FieldType;
 import by.softarex.internship.task.questionnaireportalsystem.entity.Questionnaire;
-import by.softarex.internship.task.questionnaireportalsystem.entity.QuestionnaireResponse;
+import by.softarex.internship.task.questionnaireportalsystem.entity.FieldResponse;
 import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.FieldNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.QuestionnaireNotExistException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldOptionRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.FieldRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireRepository;
-import by.softarex.internship.task.questionnaireportalsystem.repository.QuestionnaireResponseRepository;
+import by.softarex.internship.task.questionnaireportalsystem.repository.FieldResponseRepository;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
 import by.softarex.internship.task.questionnaireportalsystem.util.FieldMapper;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class FieldService {
     private final QuestionnaireRepository questionnaireRepository;
     private final UserRepository userRepository;
     private final FieldOptionRepository fieldOptionRepository;
-    private final QuestionnaireResponseRepository questionnaireResponseRepository;
+    private final FieldResponseRepository fieldResponseRepository;
     private final FieldMapper mapper;
 
     public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
@@ -124,9 +124,9 @@ public class FieldService {
     }
 
     private void deleteFieldResponses(Field field) {
-        List<QuestionnaireResponse> responses = questionnaireResponseRepository.findAllByField(field);
+        List<FieldResponse> responses = fieldResponseRepository.findAllByField(field);
         if (!responses.isEmpty()) {
-            questionnaireResponseRepository.deleteAll(responses);
+            fieldResponseRepository.deleteAll(responses);
         }
     }
 
