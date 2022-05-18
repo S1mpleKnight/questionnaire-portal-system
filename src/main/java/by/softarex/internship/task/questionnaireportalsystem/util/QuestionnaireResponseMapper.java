@@ -14,6 +14,7 @@ public class QuestionnaireResponseMapper {
 
     public QuestionnaireResponseDto toResponse(QuestionnaireResponse response) {
         QuestionnaireResponseDto responseDto = new QuestionnaireResponseDto();
+        responseDto.setId(response.getId().toString());
         responseDto.setResponses(
                 response.getConcreteResponses()
                         .stream()

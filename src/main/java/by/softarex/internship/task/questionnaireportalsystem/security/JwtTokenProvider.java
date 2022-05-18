@@ -45,6 +45,9 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
+            if (token.trim().length() == 0) {
+                throw new JwtAuthenticationException("JWT token is not valid");
+            }
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token.split(" ")[1]);
             return isTokenValid(claimsJws);
         } catch (JwtException | IllegalArgumentException e) {

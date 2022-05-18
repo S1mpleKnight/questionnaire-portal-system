@@ -10,5 +10,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class QuestionnaireResponseDto {
+    private String id;
     private List<FieldResponseDto> responses;
 }
