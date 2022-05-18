@@ -5,7 +5,7 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.FieldRespons
 import org.springframework.stereotype.Component;
 
 @Component
-public class FieldResponseEntityMapper {
+public class FieldResponseMapper {
     public FieldResponseDto toResponseDto(FieldResponse fieldResponse) {
         FieldResponseDto fieldResponseDto = new FieldResponseDto();
         fieldResponseDto.setValue(fieldResponse.getValue());

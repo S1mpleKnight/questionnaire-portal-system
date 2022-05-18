@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class UserEntityMapper {
+public class UserMapper {
     private final PasswordEncoder passwordEncoder;
 
     public UserDataDto toUserDto(User user) {

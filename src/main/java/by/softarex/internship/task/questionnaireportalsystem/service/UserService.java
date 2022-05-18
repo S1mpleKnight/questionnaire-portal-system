@@ -7,7 +7,7 @@ import by.softarex.internship.task.questionnaireportalsystem.entity.User;
 import by.softarex.internship.task.questionnaireportalsystem.exception.EmailExistException;
 import by.softarex.internship.task.questionnaireportalsystem.exception.InvalidPasswordException;
 import by.softarex.internship.task.questionnaireportalsystem.repository.UserRepository;
-import by.softarex.internship.task.questionnaireportalsystem.util.UserEntityMapper;
+import by.softarex.internship.task.questionnaireportalsystem.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +31,7 @@ public class UserService implements UserDetailsService {
     private final static String REGISTRATION_MAIL_MESSAGE = "You have been registered in the questionnaire portal system";
     private final static String REGISTRATION_MAIL_SUBJECT = "Portal registration";
     private final UserRepository userRepository;
-    private final UserEntityMapper mapper;
+    private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
 

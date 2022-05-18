@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-field-responses
+      author: Ivan Zelezinsky
+      changes:
+        - createTable:
+            tableName: field_responses
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: value
+                  type: varchar(255)
+              - column:
+                  name: position
+                  type: smallint

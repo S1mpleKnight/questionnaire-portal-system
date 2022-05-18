@@ -14,15 +14,5 @@ import java.util.UUID;
 
 @Repository
 public interface FieldResponseRepository extends JpaRepository<FieldResponse, UUID> {
-    List<FieldResponse> findAllByField(Field field);
-
-    Boolean existsByAnswerId(UUID answerId);
-
-    @Query(
-            value = "SELECT * FROM responses r WHERE r.questionnaire_id = ?1 ORDER BY answer_id, creation_date DESC, position ASC",
-            nativeQuery = true
-    )
-    List<FieldResponse> findAllSorted(UUID questionnaireId);
-
-    Page<FieldResponse> findAllByQuestionnaireOrderByAnswerId(Questionnaire questionnaire, Pageable pageable);
+    List<FieldResponse> findAllByResponse_Questionnaire(Questionnaire questionnaire);
 }
