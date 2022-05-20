@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String[] AUTH_WHITELIST = {
+            "/api/questionnaires/*",
             "/api/responses/*",
             "/api/register",
             "/api/login",

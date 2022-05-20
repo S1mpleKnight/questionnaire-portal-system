@@ -39,6 +39,12 @@ public class UserController {
         return ResponseEntity.ok(userService.update(principal, updateDto));
     }
 
+    @Operation(summary = "Get user id")
+    @GetMapping("/id")
+    public ResponseEntity<String> getUserId(Principal principal) {
+        return ResponseEntity.ok(userService.findIdByEmail(principal));
+    }
+
     @Operation(summary = "Update password")
     @PutMapping("/password")
     public ResponseEntity<Boolean> updatePassword(
