@@ -39,6 +39,10 @@ public class UserService implements UserDetailsService {
         return mapper.toUserDto(userRepository.findByEmail(principal.getName()).get());
     }
 
+    public String findIdByEmail(Principal principal) {
+        return userRepository.findByEmail(principal.getName()).get().getId().toString();
+    }
+
     @Transactional
     public UserDataDto save(UserDto userDto) {
         User user = mapper.toUserEntity(userDto);

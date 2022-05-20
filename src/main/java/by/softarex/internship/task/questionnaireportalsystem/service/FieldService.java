@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +47,10 @@ public class FieldService {
     public Page<FieldDto> findAllByUserEmail(Principal principal, Pageable pageable) {
         Page<Field> fields = getAllField(principal, pageable);
         return fields.map(mapper::toFieldDto);
+    }
+
+    public List<FieldDto> findAllByUserId(UUID userId) {
+        return getAllField(userId).stream().map(mapper::toFieldDto).collect(Collectors.toList());
     }
 
     public FieldDto getFieldDto(Principal principal, Integer fieldPosition) {
@@ -108,6 +113,13 @@ public class FieldService {
 
     private List<Field> getAllField(Principal principal) {
         Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Email(principal.getName());
+        return questionnaire.isPresent()
+                ? fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId())
+                : Collections.emptyList();
+    }
+
+    private List<Field> getAllField(UUID userId) {
+        Optional<Questionnaire> questionnaire = questionnaireRepository.findByUser_Id(userId);
         return questionnaire.isPresent()
                 ? fieldRepository.findAllByQuestionnaire_IdOrderByPositionAsc(questionnaire.get().getId())
                 : Collections.emptyList();
